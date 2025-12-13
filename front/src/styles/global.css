@@ -1,0 +1,28 @@
+@import "tailwindcss";
+
+*,
+*::before,
+*::after {
+    font-family: "Poppins", sans-serif;
+    color: white;
+}
+
+.app-container {
+    background-color: #12202d;
+    background-repeat: no-repeat;
+    background-attachment: fixed;
+    min-height: 100vh;
+}
+
+.login-card {
+    width: 90%;
+    max-width: 30vw;
+    min-height: 30vw;
+    background: rgba(10, 25, 47, 0.5);
+    padding: 2.5rem 2rem;
+    border-radius: 15px;
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.37);
+    backdrop-filter: blur(10px);
+    -webkit-backdrop-filter: blur(10px);
+}
