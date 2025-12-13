@@ -17,6 +17,13 @@ class Settings(BaseSettings):
     PROJECT_NAME: str = "Yuknow"
     SECRET_KEY: str = "dev-secret-key-change-in-production"
     REFRESH_SECRET_KEY: str = "dev-refresh-secret-key-change-in-production"
+    OPENAI_MODEL: str = "gpt-4o-mini"
+    AI_TIMEOUT_SECONDS: int = 10
+    AI_MAX_RETRIES: int = 2
+
+    # Feature Flags
+    ENABLE_AI_NORMALIZATION: bool = True
+    ENABLE_RULE_BASED_NORMALIZATION: bool = True
 
     ALGORITHM: str = "HS256"
 
