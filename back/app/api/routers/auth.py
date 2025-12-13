@@ -4,15 +4,11 @@ Authentication router
 Handles user login and token refresh endpoints.
 """
 
-from datetime import timedelta
+from fastapi import APIRouter, status
 
-from fastapi import APIRouter, Depends, HTTPException, status
-from sqlmodel import select
-
-from app.domain.schemas import LoginRequest, LoginResponse, TokenPayload, UserData
 from app.core.db import SessionDep
-from app.core.security import create_access_token, create_refresh_token, verify_password
-from app.models import User
+from app.domain.schemas import LoginRequest, LoginResponse, UserData
+from app.services.auth import AuthService
 
 router = APIRouter()
 
@@ -40,28 +36,12 @@ def login(credentials: LoginRequest, db: SessionDep) -> LoginResponse:
     }
     ```
     """
-    # Find user by email
-    statement = select(User).where(User.email == credentials.email)
-    user = db.exec(statement).first()
-
-    # Validate credentials
-    if not user or not verify_password(credentials.password, user.password):
-        raise HTTPException(
-            status_code=status.HTTP_401_UNAUTHORIZED,
-            detail="Invalid email or password",
-        )
-
-    # Check if account is active
-    if not user.is_active:
-        raise HTTPException(
-            status_code=status.HTTP_401_UNAUTHORIZED,
-            detail="Account is inactive",
-        )
+    # Authenticate user
+    user = AuthService.authenticate_user(
+        db, credentials.email, credentials.password)
 
     # Generate tokens
-    token_data = {"sub": str(user.id)}
-    access_token = create_access_token(token_data)
-    refresh_token = create_refresh_token(token_data)
+    tokens = AuthService.generate_tokens(str(user.id))
 
     # Prepare user data response
     user_data = UserData(
@@ -73,8 +53,8 @@ def login(credentials: LoginRequest, db: SessionDep) -> LoginResponse:
     )
 
     return LoginResponse(
-        token=access_token,
-        refresh_token=refresh_token,
+        token=tokens["access_token"],
+        refresh_token=tokens["refresh_token"],
         user_data=user_data,
     )
 
