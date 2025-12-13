@@ -45,12 +45,16 @@ class Settings(BaseSettings):
             return 7  # 7 days in production
         return 30  # 30 days in development
 
+    OPENAI_API_KEY: str
+
     # postgres
     POSTGRES_SERVER: str
     POSTGRES_PORT: int = 5432
     POSTGRES_USER: str
     POSTGRES_PASSWORD: str
     POSTGRES_DB: str
+
+    DATA_LAKE_URI: str
 
     @computed_field  # type: ignore[prop-decorator]
     @property
