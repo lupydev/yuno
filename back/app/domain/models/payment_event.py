@@ -8,7 +8,7 @@ from uuid import UUID, uuid4
 import sqlalchemy
 from sqlmodel import JSON, Column, Field, SQLModel
 
-from app.domain.models.enums import FailureReason, NormalizationMethod, PaymentStatus
+from app.domain.models.enums import ErrorSource, FailureReason, NormalizationMethod, PaymentStatus
 
 
 def get_utc_now() -> datetime:
@@ -27,7 +27,7 @@ class NormalizedPaymentEvent(SQLModel, table=True):
     Las validaciones de negocio están en los schemas (normalization_schemas.py).
     """
 
-    __tablename__ = "normalized_payment_events"
+    __tablename__ = "normalized_payment_events"  # type: ignore[assignment]
 
     # Índices compuestos para queries comunes (Best Practice)
     __table_args__ = (
@@ -40,6 +40,13 @@ class NormalizedPaymentEvent(SQLModel, table=True):
             "status_category",
             "created_at",
         ),
+        sqlalchemy.Index("idx_transactional_id", "transactional_id"),
+        sqlalchemy.Index(
+            "idx_error_analysis",
+            "error_source",
+            "failure_reason",
+            "status_category",
+        ),
     )
 
     # Primary Key
@@ -51,22 +58,48 @@ class NormalizedPaymentEvent(SQLModel, table=True):
         max_length=100, index=True, description="Payment provider (stripe, adyen, etc.)"
     )
     country: str = Field(max_length=2, description="ISO 3166-1 alpha-2 country code")
+    transactional_id: str | None = Field(
+        default=None,
+        max_length=255,
+        index=True,
+        description="Merchant-Provider connection ID from Data Lake (multiple events can share same transactional_id)",
+    )
 
     # Status
     status_category: PaymentStatus = Field(index=True, description="Normalized payment status")
     failure_reason: FailureReason | None = Field(
         default=None, description="Specific failure reason if applicable"
     )
+    error_source: ErrorSource | None = Field(
+        default=None,
+        index=True,
+        description="Who/what caused the error (provider, merchant, customer, network, system)",
+    )
+    http_status_code: int | None = Field(
+        default=None,
+        ge=100,
+        le=599,
+        description="HTTP status code from provider response (for coherence validation)",
+    )
 
-    # Financial
-    amount: Decimal = Field(
+    # Financial (dual storage: original + USD equivalent for analytics)
+    # OPTIONAL: Error events may not contain amount/currency information
+    amount: Decimal | None = Field(
+        default=None,
         max_digits=15,
         decimal_places=2,
-        description="Transaction amount in original currency",
+        description="Transaction amount in original currency (optional - may be null for error events)",
     )
-    currency: str = Field(
+    currency: str | None = Field(
+        default=None,
         max_length=3,
-        description="ISO 4217 currency code (USD, EUR, MXN, etc.)",
+        description="ISO 4217 currency code (USD, EUR, MXN, etc.) - optional for error events",
+    )
+    amount_usd_equivalent: Decimal | None = Field(
+        default=None,
+        max_digits=15,
+        decimal_places=2,
+        description="Amount converted to USD for analytics (using exchange rate at normalization time)",
     )
 
     # Provider Details

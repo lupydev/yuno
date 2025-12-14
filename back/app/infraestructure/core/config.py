@@ -53,6 +53,11 @@ class Settings(BaseSettings):
         return 30  # 30 days in development
 
     OPENAI_API_KEY: str
+    OPENAI_MODEL: str = "gpt-4o-mini"
+    GEMINI_API_KEY: str = ""
+    GEMINI_MODEL: str = "gemini-2.0-flash-lite"
+    AI_TIMEOUT_SECONDS: int = 10
+    AI_MAX_RETRIES: int = 2
 
     # Slack Configuration
     SLACK_BOT_TOKEN: str = ""

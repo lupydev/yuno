@@ -1,21 +1,11 @@
-"""
-Logging Configuration - InvMe Event Platform
-
-Sistema de logging centralizado con soporte para:
-- Diferentes niveles según entorno (development/production)
-- Formato estructurado JSON en producción
-- Logs en consola coloreados en desarrollo
-- Rotación de archivos
-- Integración con FastAPI y servicios
-"""
-
 import logging
 import sys
 from pathlib import Path
 from typing import Any
 
-from app.infraestructure.core.config import settings
 from pythonjsonlogger.json import JsonFormatter
+
+from app.infraestructure.core.config import settings
 
 
 class ColoredFormatter(logging.Formatter):
@@ -244,8 +234,7 @@ def log_function_call(logger: logging.Logger):
 
     def decorator(func):
         async def async_wrapper(*args, **kwargs):
-            logger.debug(
-                f"Calling {func.__name__} with args={args}, kwargs={kwargs}")
+            logger.debug(f"Calling {func.__name__} with args={args}, kwargs={kwargs}")
             try:
                 result = await func(*args, **kwargs)
                 logger.debug(f"{func.__name__} completed successfully")
@@ -255,8 +244,7 @@ def log_function_call(logger: logging.Logger):
                 raise
 
         def sync_wrapper(*args, **kwargs):
-            logger.debug(
-                f"Calling {func.__name__} with args={args}, kwargs={kwargs}")
+            logger.debug(f"Calling {func.__name__} with args={args}, kwargs={kwargs}")
             try:
                 result = func(*args, **kwargs)
                 logger.debug(f"{func.__name__} completed successfully")

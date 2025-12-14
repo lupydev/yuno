@@ -50,6 +50,21 @@ class FailureReason(str, Enum):
     NOT_APPLICABLE = "not_applicable"  # Para transacciones exitosas
 
 
+class ErrorSource(str, Enum):
+    """
+    Identifica quién es responsable del error/fallo
+
+    Usado para alertas inteligentes y análisis de root cause.
+    """
+
+    PROVIDER = "provider"  # Error del payment provider (timeout, gateway error, etc.)
+    MERCHANT = "merchant"  # Error del merchant (config, credenciales, reglas de negocio)
+    CUSTOMER = "customer"  # Error del cliente (tarjeta inválida, fondos insuficientes)
+    SYSTEM = "system"  # Error interno del sistema (normalización, base de datos)
+    NETWORK = "network"  # Error de red/conectividad
+    UNKNOWN = "unknown"  # No se puede determinar el origen
+
+
 class NormalizationMethod(str, Enum):
     """Método utilizado para normalizar el evento"""
 
