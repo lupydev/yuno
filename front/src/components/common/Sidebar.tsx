@@ -1,5 +1,6 @@
 import React from 'react';
-import { LayoutDashboard, Activity, Bell, Menu, User } from 'lucide-react';
+import { LayoutDashboard, Activity, Users, Bell, Menu } from 'lucide-react';
+import { useNavigate } from 'react-router-dom';
 
 interface SidebarProps {
     sidebarOpen: boolean;
@@ -7,15 +8,17 @@ interface SidebarProps {
 }
 
 const Sidebar: React.FC<SidebarProps> = ({ sidebarOpen, setSidebarOpen }) => {
+    const navigate = useNavigate();
+
     const navItems = [
-        { icon: LayoutDashboard, label: 'Overview', active: true },
-        { icon: User, label: 'Users', active: false },  // <-- Changed icon
-        { icon: Activity, label: 'Transactions', active: false },
+        { icon: LayoutDashboard, label: 'Overview', path: '/dashboard' },
+        { icon: Users, label: 'Users', path: '/users' },
+        { icon: Activity, label: 'Reports', path: '/reports' },
     ];
 
     return (
         <div className={`${sidebarOpen ? 'w-64' : 'w-20'} bg-slate-900 border-r border-slate-800 transition-all duration-300 flex flex-col`}>
-            {/* Logo / Top Bar */}
+            {/* Logo + Toggle */}
             <div className="p-6 border-b border-slate-800 flex items-center justify-between">
                 {sidebarOpen && <div className="text-2xl font-bold text-white">YUNO</div>}
                 <button onClick={() => setSidebarOpen(!sidebarOpen)} className="p-2 hover:bg-slate-800 rounded-lg">
@@ -28,9 +31,10 @@ const Sidebar: React.FC<SidebarProps> = ({ sidebarOpen, setSidebarOpen }) => {
                 {navItems.map((item, idx) => (
                     <button
                         key={idx}
-                        className={`w-full flex items-center gap-3 px-4 py-3 rounded-lg transition-colors ${
-                            item.active ? 'bg-blue-600 text-white' : 'text-slate-400 hover:bg-slate-800 hover:text-slate-200'
-                        }`}
+                        onClick={() => navigate(item.path)}
+                        className={`w-full flex items-center gap-3 px-4 py-3 rounded-lg transition-colors
+                            ${item.label === 'Overview' ? 'bg-blue-600 text-white' : 'text-slate-400 hover:bg-slate-800 hover:text-slate-200'}
+                        `}
                     >
                         <item.icon className="w-5 h-5" />
                         {sidebarOpen && <span className="font-medium">{item.label}</span>}
