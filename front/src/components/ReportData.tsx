@@ -156,9 +156,9 @@ const TransactionReport: React.FC = () => {
     });
 
     const statusColors = {
-        pending: 'bg-gray-700 text-gray-300',
-        'in-progress': 'bg-blue-900 text-blue-300',
-        resolved: 'bg-green-900 text-green-300',
+        pending: 'bg-slate-700 text-slate-300',
+        'in-progress': 'bg-indigo-900 text-indigo-300',
+        resolved: 'bg-emerald-900 text-emerald-300',
         rejected: 'bg-red-900 text-red-300'
     };
 
@@ -171,14 +171,26 @@ const TransactionReport: React.FC = () => {
     };
 
     return (
-        <div className="min-h-screen bg-gray-900 p-6">
+        <div className="min-h-screen bg-slate-900 p-6 antialiased text-slate-100">
             <div className="max-w-7xl mx-auto space-y-6">
                 {/* Header */}
-                <div className="bg-gray-800 rounded-lg shadow-lg p-6 border border-gray-700">
+                <div className="flex items-center justify-between mb-4">
+                    <div className="flex items-center gap-3 text-sm text-slate-400">
+                        <span className="px-2 py-1 bg-slate-800/40 rounded-md text-slate-200">Reports</span>
+                        <span className="text-slate-500">/</span>
+                        <span className="text-slate-300 font-medium">View Report</span>
+                    </div>
+                    <button className="text-sm px-3 py-1 bg-slate-800/40 rounded-md hover:bg-slate-800/50">Back to list</button>
+                </div>
+                <div className="relative bg-gradient-to-b from-slate-900/60 to-slate-900/40 rounded-xl shadow-sm p-6 border border-slate-800/20 ring-1 ring-slate-700/30">
+                    <div className="mb-3 flex items-center gap-3">
+                        <span className="text-xs px-2 py-1 bg-indigo-600 text-white rounded-md">REPORT</span>
+                        <span className="text-xs text-slate-400">Viewing detailed findings</span>
+                    </div>
                     <div className="flex items-start justify-between mb-4">
                         <div className="flex-1">
-                            <h1 className="text-3xl font-bold text-gray-100 mb-2">{reportData.title}</h1>
-                            <div className="flex items-center gap-4 text-sm text-gray-400">
+                            <h1 className="text-3xl font-bold text-white mb-2">{reportData.title}</h1>
+                            <div className="flex items-center gap-4 text-sm text-slate-400">
                 <span className="flex items-center gap-1">
                   <Clock className="w-4 h-4" />
                     {new Date(reportData.date).toLocaleString()}
@@ -190,19 +202,19 @@ const TransactionReport: React.FC = () => {
                         </div>
                         <div className="flex items-center gap-2">
                             {reportData.humanChecked ? (
-                                <div className="flex items-center gap-2 px-4 py-2 bg-green-900/30 rounded-lg border border-green-800">
-                                    <CheckCircle className="w-5 h-5 text-green-400" />
-                                    <span className="text-sm font-medium text-green-300">Human Verified</span>
+                                <div className="flex items-center gap-2 px-3 py-2 bg-emerald-900/20 rounded-md border border-emerald-800/30">
+                                    <CheckCircle className="w-5 h-5 text-emerald-400" />
+                                    <span className="text-sm font-medium text-emerald-300">Human Verified</span>
                                 </div>
                             ) : (
-                                <div className="flex items-center gap-2 px-4 py-2 bg-yellow-900/30 rounded-lg border border-yellow-800">
-                                    <AlertCircle className="w-5 h-5 text-yellow-400" />
-                                    <span className="text-sm font-medium text-yellow-300">Pending Review</span>
+                                <div className="flex items-center gap-2 px-3 py-2 bg-amber-900/20 rounded-md border border-amber-800/30">
+                                    <AlertCircle className="w-5 h-5 text-amber-400" />
+                                    <span className="text-sm font-medium text-amber-300">Pending Review</span>
                                 </div>
                             )}
                             <button
                                 onClick={scrollToGraphs}
-                                className="flex items-center gap-2 px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-lg transition-colors duration-200 font-medium"
+                                className="flex items-center gap-2 px-4 py-2 bg-indigo-600 hover:bg-indigo-700 text-white rounded-md transition-colors duration-200 font-medium"
                             >
                                 <BarChart3 className="w-5 h-5" />
                                 Jump to Graphs
@@ -210,36 +222,36 @@ const TransactionReport: React.FC = () => {
                         </div>
                     </div>
 
-                    <div className="border-t border-gray-700 pt-4">
-                        <h3 className="text-sm font-semibold text-gray-300 mb-2">AI Analysis</h3>
-                        <p className="text-gray-400 leading-relaxed">{reportData.aiDescription}</p>
+                    <div className="border-t border-slate-800/30 pt-4">
+                        <h3 className="text-sm font-semibold text-slate-300 mb-2">AI Analysis</h3>
+                        <p className="text-slate-300 leading-relaxed">{reportData.aiDescription}</p>
                     </div>
                 </div>
 
                 {/* Cause Analysis */}
-                <div className="bg-gray-800 rounded-lg shadow-lg p-6 border border-gray-700">
+                <div className="bg-gradient-to-b from-slate-900/60 to-slate-900/40 rounded-xl shadow-sm p-6 border border-slate-800/20">
                     <h2 className="text-xl font-bold text-gray-100 mb-4">Root Cause Analysis</h2>
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                        <div className="border border-gray-700 rounded-lg p-4 bg-gray-900/50">
-                            <span className="text-sm font-medium text-gray-400">Responsible Party</span>
-                            <p className="text-lg font-semibold text-gray-100 mt-1 capitalize">{reportData.cause.type}</p>
+                        <div className="border border-slate-800/30 rounded-lg p-4 bg-slate-900/40">
+                            <span className="text-sm font-medium text-slate-400">Responsible Party</span>
+                            <p className="text-lg font-semibold text-white mt-1 capitalize">{reportData.cause.type}</p>
                             {reportData.cause.type === 'yuno' && reportData.cause.details?.yunoComponent && (
-                                <span className="inline-block mt-2 px-3 py-1 bg-purple-900/50 text-purple-300 text-xs font-medium rounded-full border border-purple-800">
+                                <span className="inline-block mt-2 px-3 py-1 bg-purple-900/40 text-purple-300 text-xs font-medium rounded-full border border-purple-800">
                   {reportData.cause.details.yunoComponent.toUpperCase()}
                 </span>
                             )}
                         </div>
-                        <div className="border border-gray-700 rounded-lg p-4 bg-gray-900/50">
-                            <span className="text-sm font-medium text-gray-400">Provider</span>
-                            <p className="text-lg font-semibold text-gray-100 mt-1">{reportData.cause.details?.providerName || 'N/A'}</p>
+                        <div className="border border-slate-800/30 rounded-lg p-4 bg-slate-900/40">
+                            <span className="text-sm font-medium text-slate-400">Provider</span>
+                            <p className="text-lg font-semibold text-white mt-1">{reportData.cause.details?.providerName || 'N/A'}</p>
                         </div>
-                        <div className="border border-gray-700 rounded-lg p-4 bg-gray-900/50">
-                            <span className="text-sm font-medium text-gray-400">Client/Merchant</span>
-                            <p className="text-lg font-semibold text-gray-100 mt-1">{reportData.cause.details?.clientName || 'N/A'}</p>
+                        <div className="border border-slate-800/30 rounded-lg p-4 bg-slate-900/40">
+                            <span className="text-sm font-medium text-slate-400">Client/Merchant</span>
+                            <p className="text-lg font-semibold text-white mt-1">{reportData.cause.details?.clientName || 'N/A'}</p>
                         </div>
                         {reportData.cause.details?.missingParams && reportData.cause.details.missingParams.length > 0 && (
-                            <div className="border border-gray-700 rounded-lg p-4 bg-gray-900/50">
-                                <span className="text-sm font-medium text-gray-400">Missing Parameters</span>
+                            <div className="border border-slate-800/30 rounded-lg p-4 bg-slate-900/40">
+                                <span className="text-sm font-medium text-slate-400">Missing Parameters</span>
                                 <div className="flex flex-wrap gap-2 mt-2">
                                     {reportData.cause.details.missingParams.map((param, idx) => (
                                         <span key={idx} className="px-2 py-1 bg-red-900/50 text-red-300 text-xs font-mono rounded border border-red-800">
@@ -254,18 +266,18 @@ const TransactionReport: React.FC = () => {
 
                 {/* Solutions */}
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                    <div className="bg-gray-800 rounded-lg shadow-lg p-6 border border-gray-700">
-                        <h2 className="text-xl font-bold text-gray-100 mb-4">AI Recommended Solution</h2>
-                        <p className="text-gray-300 leading-relaxed">{reportData.aiSolution}</p>
+                    <div className="bg-gradient-to-br from-slate-900/50 to-slate-900/30 rounded-xl p-6 border border-slate-800/20 shadow-sm">
+                        <h2 className="text-xl font-bold text-white mb-4">AI Recommended Solution</h2>
+                        <p className="text-slate-300 leading-relaxed">{reportData.aiSolution}</p>
                     </div>
-                    <div className="bg-gray-800 rounded-lg shadow-lg p-6 border border-gray-700">
-                        <h2 className="text-xl font-bold text-gray-100 mb-4">Human Solution</h2>
-                        <p className="text-gray-300 leading-relaxed">{reportData.humanSolution}</p>
+                    <div className="bg-gradient-to-br from-slate-900/50 to-slate-900/30 rounded-xl p-6 border border-slate-800/20 shadow-sm">
+                        <h2 className="text-xl font-bold text-white mb-4">Human Solution</h2>
+                        <p className="text-slate-300 leading-relaxed">{reportData.humanSolution}</p>
                     </div>
                 </div>
 
                 {/* Charts */}
-                <div ref={graphsRef} className="bg-gray-800 rounded-lg shadow-lg p-6 border border-gray-700">
+                <div ref={graphsRef} className="bg-gradient-to-b from-slate-900/60 to-slate-900/40 rounded-xl p-6 border border-slate-800/20 shadow-sm">
                     <h2 className="text-xl font-bold text-gray-100 mb-6">Failed Transactions by Hour</h2>
                     <ResponsiveContainer width="100%" height={300}>
                         <BarChart data={reportData.failedTransactions}>
@@ -283,8 +295,8 @@ const TransactionReport: React.FC = () => {
                     </ResponsiveContainer>
                 </div>
 
-                <div className="bg-gray-800 rounded-lg shadow-lg p-6 border border-gray-700">
-                    <h2 className="text-xl font-bold text-gray-100 mb-6">Latency by Hour</h2>
+                <div className="bg-gradient-to-br from-slate-900/50 to-slate-900/30 rounded-xl p-6 border border-slate-800/20 shadow-sm">
+                    <h2 className="text-xl font-bold text-white mb-6">Latency by Hour</h2>
                     <ResponsiveContainer width="100%" height={300}>
                         <LineChart data={reportData.latency}>
                             <CartesianGrid strokeDasharray="3 3" stroke="#374151" />
@@ -301,8 +313,8 @@ const TransactionReport: React.FC = () => {
                     </ResponsiveContainer>
                 </div>
 
-                <div className="bg-gray-800 rounded-lg shadow-lg p-6 border border-gray-700">
-                    <h2 className="text-xl font-bold text-gray-100 mb-6">Technical Errors by Hour</h2>
+                <div className="bg-gradient-to-br from-slate-900/50 to-slate-900/30 rounded-xl p-6 border border-slate-800/20 shadow-sm">
+                    <h2 className="text-xl font-bold text-white mb-6">Technical Errors by Hour</h2>
                     <ResponsiveContainer width="100%" height={300}>
                         <BarChart data={reportData.technicalErrors}>
                             <CartesianGrid strokeDasharray="3 3" stroke="#374151" />
@@ -324,8 +336,8 @@ const TransactionReport: React.FC = () => {
                 </div>
 
                 <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-                    <div className="bg-gray-800 rounded-lg shadow-lg p-6 border border-gray-700">
-                        <h2 className="text-xl font-bold text-gray-100 mb-6">Approval Status Distribution</h2>
+                    <div className="bg-gradient-to-br from-slate-900/50 to-slate-900/30 rounded-xl p-6 border border-slate-800/20 shadow-sm">
+                        <h2 className="text-xl font-bold text-white mb-6">Approval Status Distribution</h2>
                         <div className="flex items-center justify-center">
                             <ResponsiveContainer width="100%" height={350}>
                                 <PieChart>
@@ -353,8 +365,8 @@ const TransactionReport: React.FC = () => {
                         </div>
                     </div>
 
-                    <div className="bg-gray-800 rounded-lg shadow-lg p-6 border border-gray-700">
-                        <h2 className="text-xl font-bold text-gray-100 mb-6">Transaction Success Rate by Hour</h2>
+                    <div className="bg-gradient-to-br from-slate-900/50 to-slate-900/30 rounded-xl p-6 border border-slate-800/20 shadow-sm">
+                        <h2 className="text-xl font-bold text-white mb-6">Transaction Success Rate by Hour</h2>
                         <ResponsiveContainer width="100%" height={350}>
                             <LineChart data={reportData.successRate}>
                                 <CartesianGrid strokeDasharray="3 3" stroke="#374151" />
