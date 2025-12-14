@@ -1,0 +1,55 @@
+{
+  "type": "provider_failure",
+  "severity": "critical",
+  "title": "Provider STRIPE está fallando críticamente",
+  "message": "Success rate de 45% (< 60%)",
+  "provider": "stripe",
+  "success_rate": 45.0,
+  "total_events": 100,
+  "failed_events": 55,
+  "detected_at": "2025-12-14T16:32:09.240060+00:00",
+  "time_window": "1 hour",
+  "ai_slack_blocks": [
+    {
+      "type": "header",
+      "text": {
+        "type": "plain_text",
+        "text": "🚨 Provider STRIPE - Falla Crítica Detectada",
+        "emoji": true
+      }
+    },
+    {
+      "type": "section",
+      "text": {
+        "type": "mrkdwn",
+        "text": "*Resumen:*\nEl provider STRIPE presenta una tasa de éxito del 45%, muy por debajo del umbral del 60%. 55 de 100 transacciones han fallado en la última hora."
+      }
+    },
+    {
+      "type": "section",
+      "text": {
+        "type": "mrkdwn",
+        "text": "*Detalles:*\n• *Causa Probable:* Problemas en la API del provider\n• *Patrón:* Timeout errors (503) en 80% de fallos\n• *Afectados:* Todos los merchants usando STRIPE"
+      }
+    },
+    {
+      "type": "section",
+      "text": {
+        "type": "mrkdwn",
+        "text": "📊 *Métricas:*\n• Tasa de éxito: `45%` (55/100 fallos)\n• Ventana de tiempo: última hora\n• Impacto estimado: ~$5,000 USD en transacciones bloqueadas"
+      }
+    },
+    {
+      "type": "divider"
+    },
+    {
+      "type": "section",
+      "text": {
+        "type": "mrkdwn",
+        "text": "✅ *Acciones Recomendadas:*\n1. Verificar status page del provider STRIPE\n2. Contactar soporte técnico de STRIPE\n3. Activar provider alternativo si disponible\n4. Comunicar a merchants afectados"
+      }
+    }
+  ],
+  "ai_suggested_color": "danger",
+  "enriched_at": "2025-12-14T16:32:09.240060+00:00"
+}
