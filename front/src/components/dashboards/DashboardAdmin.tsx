@@ -226,7 +226,7 @@ const DashboardAdmin: React.FC = () => {
                             <select
                                 value={timeRange}
                                 onChange={(e) => setTimeRange(e.target.value)}
-                                className="px-3 py-2 rounded-md bg-slate-800/60 text-slate-200 font-medium border border-transparent hover:border-slate-700 transition"
+                                className="time-range-select px-3 py-2 rounded-md bg-slate-800/60 text-slate-200 font-medium border border-transparent hover:border-slate-700 transition"
                             >
                                 <option value="1h">Last Hour</option>
                                 <option value="24h">Last 24 Hours</option>
@@ -396,7 +396,7 @@ const DashboardAdmin: React.FC = () => {
                                 </div>
                             </div>
 
-                            <div className="bg-slate-900 rounded-xl p-4 border border-slate-800/30">
+                            <div className="card-surface bg-slate-900 rounded-xl p-4 border border-slate-800/30">
                                 <p className="text-sm text-slate-400">Showing recent reports related to this alert. Click any item for full details.</p>
                                 <ul className="mt-3 space-y-2">
                                     <li className="p-3 bg-slate-800/30 rounded-md">Report — Example failure log (ID: 001)</li>

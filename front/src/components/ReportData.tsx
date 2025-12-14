@@ -197,7 +197,7 @@ const TransactionReport: React.FC = () => {
                         <span>Back to list</span>
                     </button>
                 </div>
-                <div className="relative bg-gradient-to-b from-slate-900/60 to-slate-900/40 rounded-xl shadow-sm p-6 border border-slate-800/20 ring-1 ring-slate-700/30">
+                <div className="card-surface relative bg-gradient-to-b from-slate-900/60 to-slate-900/40 rounded-xl shadow-sm p-6 border border-slate-800/20 ring-1 ring-slate-700/30">
                     <div className="mb-3 flex items-center gap-3">
                         <span className="text-xs px-2 py-1 bg-indigo-600 text-white rounded-md">REPORT</span>
                         <span className="text-xs text-slate-400">Viewing detailed findings</span>
@@ -259,7 +259,7 @@ const TransactionReport: React.FC = () => {
                 </div>
 
                 {/* Cause Analysis */}
-                <div className="bg-gradient-to-b from-slate-900/60 to-slate-900/40 rounded-xl shadow-sm p-6 border border-slate-800/20">
+                <div className="card-surface bg-gradient-to-b from-slate-900/60 to-slate-900/40 rounded-xl shadow-sm p-6 border border-slate-800/20">
                     <h2 className="text-xl font-bold text-gray-100 mb-4">Root Cause Analysis</h2>
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                         <div className="border border-slate-800/30 rounded-lg p-4 bg-slate-900/40">

@@ -83,9 +83,26 @@
   fill: #ffffff !important;
 }
 
+/* Ensure tooltip background is dark in light mode (override bg-slate-800 mapping) */
+[data-theme="light"] .chart-root .chart-tooltip .bg-slate-800 {
+  background-color: rgba(15,23,42,0.95) !important; /* dark slate */
+  border-color: rgba(255,255,255,0.06) !important;
+}
+
 /* Make chart inner area white in light mode */
 [data-theme="light"] .chart-root .chart-area { background-color: #ffffff !important; border-color: #e6e6e6 !important; }
 
+/* time-range select in light mode: make white background but keep font colors unchanged */
+[data-theme="light"] .time-range-select {
+  background-color: #ffffff !important;
+  border-color: #e2e8f0 !important;
+}
+
+/* card-surface: ensure card panels are white */
+[data-theme="light"] .card-surface {
+  background-color: #ffffff !important;
+  border-color: #e6e6e6 !important;
+}
 
 /* Strong override: ensure purple buttons and any children always use white text in light mode */
 [data-theme="light"] button.bg-indigo-600,
