@@ -8,6 +8,7 @@ Follows FastAPI best practices for API organization.
 from fastapi import APIRouter
 
 from app.api.routers import (
+    alerts_router,
     analytics_router,
     auth_router,
     events,
@@ -66,6 +67,12 @@ api_router.include_router(
     analytics_router,
     prefix="/analytics",
     tags=["Analytics & Monitoring"],
+)
+
+api_router.include_router(
+    alerts_router,
+    prefix="/alerts",
+    tags=["Alerts & AI"],
 )
 
 __all__ = ["api_router"]
