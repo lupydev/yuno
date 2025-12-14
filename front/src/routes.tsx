@@ -3,26 +3,37 @@ import { ProtectedRoute } from "./components/ProtectedRoute.tsx";
 import { Login } from "./pages/LoginPage.tsx";
 import { DashboardPage } from "./pages/DashboarPage.tsx";
 import { ReportsPage } from "./pages/ReportsPage.tsx";
+import { UsersPage } from "./pages/UsersPage.tsx";
 import { DashboardLayout } from "./components/dashboards/DashboardsLayout.tsx";
 
 export const AppRoutes = () => {
     return (
         <Routes>
-            <Route path="*" element={<Navigate to="/login" />} />
-            <Route path="/" element={<Navigate to="/login" />} />
             <Route path="/login" element={<Login />} />
 
             <Route element={<DashboardLayout />}>
+                {/* Routes to ADMIN & DEVELOPER */}
                 <Route
                     element={
-                        <ProtectedRoute allowedRoles={["ADMIN", "CLIENT"]} />
+                        <ProtectedRoute allowedRoles={["ADMIN", "DEVELOPER"]} />
                     }
                 >
                     <Route path="/dashboard" element={<DashboardPage />} />
                     <Route path="/reports" element={<ReportsPage />} />
                 </Route>
-            </Route>
 
+                {/* Routes only to ADMIN */}
+                <Route
+                    element={
+                        <ProtectedRoute allowedRoles={["ADMIN"]} />
+                    }
+                >
+                    <Route path="/users" element={<UsersPage />} />
+                </Route>
+            </Route>
+            
+            <Route path="/" element={<Navigate to="/login" replace />} />
+            <Route path="*" element={<Navigate to="/login" replace />} />
         </Routes>
     );
 };

@@ -2,16 +2,17 @@
 API index - Central router aggregator
 
 Aggregates all API routers with proper versioning and documentation.
+Follows FastAPI best practices for API organization.
 """
 
 from fastapi import APIRouter
 
-from app.api.routers import auth_router, events, teams_router, users_router, worker
+from app.api.routers import auth_router, notifications, teams_router, users_router
 
 # Main API router
 api_router = APIRouter()
 
-# Authentication & User Management
+# Include all routers with appropriate prefixes and tags
 api_router.include_router(
     auth_router,
     prefix="/auth",
@@ -30,8 +31,8 @@ api_router.include_router(
     tags=["Users"],
 )
 
-# Payment Events
-api_router.include_router(events.router, prefix="/events", tags=["events"])
-api_router.include_router(worker.router, prefix="/worker", tags=["worker"])
+api_router.include_router(
+    notifications.router,
+)
 
 __all__ = ["api_router"]

@@ -13,6 +13,7 @@ from app.infraestructure.core.config import settings
 from app.infraestructure.core.db import SessionDep
 from app.infraestructure.repositories.payment_repository import PaymentRepository
 from app.models import User
+from app.schemas import TokenPayload
 from app.services.ingestion_orchestrator import IngestionOrchestrator
 from app.services.user import UserService
 

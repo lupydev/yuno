@@ -59,6 +59,11 @@ class Settings(BaseSettings):
     AI_TIMEOUT_SECONDS: int = 10
     AI_MAX_RETRIES: int = 2
 
+    # Slack Configuration
+    SLACK_BOT_TOKEN: str = ""
+    SLACK_SIGNING_SECRET: str = ""
+    SLACK_ALERTS_CHANNEL: str = ""
+
     # postgres
     POSTGRES_SERVER: str
     POSTGRES_PORT: int = 5432
@@ -80,7 +85,8 @@ class Settings(BaseSettings):
             path=self.POSTGRES_DB,
         )
 
-    BACKEND_CORS_ORIGINS: Annotated[list[AnyUrl] | str, BeforeValidator(parse_cors)] = []
+    BACKEND_CORS_ORIGINS: Annotated[list[AnyUrl]
+                                    | str, BeforeValidator(parse_cors)] = []
 
     @property
     def all_cors_origins(self) -> list[str]:

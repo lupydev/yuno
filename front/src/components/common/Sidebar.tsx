@@ -1,133 +1,57 @@
-import { NavLink } from "react-router-dom";
-import { useAuth } from "@/contexts/useAuth";
-import { useState } from "react";
-import ConfirmLogout from "../../components/common/ConfirmLogout";
-import {
-    Settings,
-    Building,
-    Headset,
-    LogOut,
-    ChartPie,
-    FileChartColumn,
-    Newspaper,
-} from "lucide-react";
+import React from 'react';
+import { LayoutDashboard, Activity, Users, Bell, Menu } from 'lucide-react';
+import { useNavigate } from 'react-router-dom';
 
-// top items
-const mainNavItems = [
-    { name: "Dashboard", href: "/dashboard", icon: <ChartPie size={25} /> },
-    {
-        name: "Gestion de Contenido",
-        href: "/contenido",
-        icon: <Newspaper size={25} />,
-        allowedRoles: ["ADMIN"],
-    },
-    {
-        name: "Gestion de Empresas",
-        href: "/empresas",
-        icon: <Building size={25} />,
-        allowedRoles: ["ADMIN"],
-    },
-    { name: "Reportes", href: "/reportes", icon: <FileChartColumn size={25} /> },
-];
+interface SidebarProps {
+    sidebarOpen: boolean;
+    setSidebarOpen: (open: boolean) => void;
+}
 
-// bottom items
-const secondaryNavItems = [
-    { name: "Soporte", href: "/soporte", icon: <Headset size={25} /> },
-    {
-        name: "Configuracion",
-        href: "/configuracion",
-        icon: <Settings size={25} />,
-    },
-    { name: "Cerrar Sesión", href: "/login", icon: <LogOut size={25} /> },
-];
+const Sidebar: React.FC<SidebarProps> = ({ sidebarOpen, setSidebarOpen }) => {
+    const navigate = useNavigate();
 
-export function Sidebar() {
-    const { role, logout } = useAuth();
-    const [showConfirm, setShowConfirm] = useState(false);
-
-    const handleLogout = () => {
-        setShowConfirm(true);
-    };
-
-    const confirmLogout = () => {
-        logout();
-        setShowConfirm(false);
-    };
-
-    const filteredMainNavItems = mainNavItems.filter(
-        (item) =>
-            !item.allowedRoles || (role !== null && item.allowedRoles.includes(role))
-    );
+    const navItems = [
+        { icon: LayoutDashboard, label: 'Overview', path: '/dashboard' },
+        { icon: Users, label: 'Users', path: '/users' },
+        { icon: Activity, label: 'Reports', path: '/reports' },
+    ];
 
     return (
-        <aside className="flex h-screen w-80 flex-col bg-[#0b1b2a] px-5 py-8">
-            <div className="mb-10 flex items-center justify-center">
-                <img src={logo} alt="Logo de Sara BI" className="h-40 w-auto" />
+        <div className={`${sidebarOpen ? 'w-64' : 'w-20'} bg-slate-900 border-r border-slate-800 transition-all duration-300 flex flex-col`}>
+            {/* Logo + Toggle */}
+            <div className="p-6 border-b border-slate-800 flex items-center justify-between">
+                {sidebarOpen && <div className="text-2xl font-bold text-white">YUNO</div>}
+                <button onClick={() => setSidebarOpen(!sidebarOpen)} className="p-2 hover:bg-slate-800 rounded-lg">
+                    <Menu className="w-5 h-5" />
+                </button>
             </div>
 
-            <nav className="flex-1">
-                <ul className="flex flex-col gap-y-3">
-                    {filteredMainNavItems.map((item) => (
-                        <li key={item.name}>
-                            <NavLink
-                                to={item.href}
-                                className={({ isActive }) =>
-                                    `flex w-full items-center gap-x-4 rounded-lg p-4 text-[1rem] font-medium transition-colors
-                                    ${
-                                        isActive
-                                            ? "bg-[#152e46]"
-                                            : "text-gray-400 hover:bg-[#182535]"
-                                    }`
-                                }
-                            >
-                                {item.icon}
-                                <span>{item.name}</span>
-                            </NavLink>
-                        </li>
-                    ))}
-                </ul>
+
+            {/* Navigation */}
+            <nav className="flex-1 p-4 space-y-2">
+                {navItems.map((item, idx) => (
+                    <button
+                        key={idx}
+                        onClick={() => navigate(item.path)}
+                        className={`w-full flex items-center gap-3 px-4 py-3 rounded-lg transition-colors
+                            ${item.label === 'Overview' ? 'bg-blue-600 text-white' : 'text-slate-400 hover:bg-slate-800 hover:text-slate-200'}
+                        `}
+                    >
+                        <item.icon className="w-5 h-5" />
+                        {sidebarOpen && <span className="font-medium">{item.label}</span>}
+                    </button>
+                ))}
             </nav>
 
-            <div className="mt-auto">
-                <ul className="flex flex-col gap-y-3">
-                    {secondaryNavItems.map((item) => (
-                        <li key={item.name}>
-                            {item.name === "Cerrar Sesión" ? (
-                                <>
-                                    <button
-                                        onClick={handleLogout}
-                                        className="flex w-full items-center gap-x-4 rounded-lg p-4 text-lg font-medium text-gray-400 transition-colors hover:bg-[#4B1E1E] hover:text-white"
-                                    >
-                                        {item.icon}
-                                        <span>{item.name}</span>
-                                    </button>
-                                    {showConfirm && (
-                                        <ConfirmLogout
-                                            onConfirm={confirmLogout}
-                                            onCancel={() => setShowConfirm(false)}
-                                        />
-                                    )}
-                                </>
-                            ) : (
-                                <NavLink
-                                    to={item.href}
-                                    className={({ isActive }) =>
-                                        `flex w-full items-center gap-x-4 rounded-lg p-4 text-lg font-medium transition-colors
-                                        ${
-                                            isActive
-                                                ? "bg-[#152e46]"
-                                                : "text-gray-400 hover:bg-[#182535]"
-                                        }`
-                                    }
-                                >
-                                    {item.icon}
-                                    <span>{item.name}</span>
-                                </NavLink>
-                            )}
-                        </li>
-                    ))}
-                </ul>
+            {/* Notifications */}
+            <div className="p-4 border-t border-slate-800">
+                <button className="w-full flex items-center gap-3 px-4 py-3 rounded-lg text-slate-400 hover:bg-slate-800 hover:text-slate-200 transition-colors">
+                    <Bell className="w-5 h-5" />
+                    {sidebarOpen && <span className="font-medium">Notifications</span>}
+                </button>
             </div>
-        </aside>
+        </div>
     );
-}
+};
+
+export default Sidebar;

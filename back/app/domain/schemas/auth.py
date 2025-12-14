@@ -4,6 +4,8 @@ Authentication schemas
 DTOs for authentication endpoints.
 """
 
+from uuid import UUID
+
 from pydantic import BaseModel, EmailStr, Field
 
 
@@ -29,8 +31,10 @@ class UserData(BaseModel):
     id: str = Field(..., description="User UUID")
     email: str = Field(..., description="User email")
     name: str = Field(..., description="User name")
-    role: str = Field(..., description="User role (ADMIN | DEVELOPER)")
-    team_id: str | None = Field(None, description="Team name (only for DEVELOPER role)")
+    role: str = Field(...,
+                      description="User role (ADMIN | DEVELOPER | CLIENT)")
+    team_id: str | None = Field(
+        None, description="Team name (only for DEVELOPER role)")
 
     model_config = {"from_attributes": True}
 

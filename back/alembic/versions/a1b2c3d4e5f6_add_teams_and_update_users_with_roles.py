@@ -36,8 +36,9 @@ def upgrade() -> None:
     op.create_foreign_key('fk_users_team_id', 'users',
                           'teams', ['team_id'], ['name'])
 
-    # Note: DEVELOPER role now exists from initial migration
-    # No need to add it here
+    # Update role enum to include DEVELOPER
+    # Note: PostgreSQL requires explicit enum type modification
+    op.execute("ALTER TYPE roles ADD VALUE IF NOT EXISTS 'DEVELOPER'")
 
 
 def downgrade() -> None:

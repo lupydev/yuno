@@ -4,8 +4,13 @@
 *::before,
 *::after {
     font-family: "Poppins", sans-serif;
-    color: white;
 }
+
+html, body, #root {
+    height: 100%;
+    overflow: hidden;
+}
+
 
 .app-container {
     background-color: #12202d;

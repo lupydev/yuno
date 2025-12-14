@@ -21,6 +21,7 @@ class Roles(str, Enum):
 
     ADMIN = "ADMIN"
     DEVELOPER = "DEVELOPER"
+    CLIENT = "CLIENT"
 
 
 class User(SQLModel, table=True):
@@ -32,7 +33,7 @@ class User(SQLModel, table=True):
         email: User email (unique)
         name: User's name
         password: User password (hashed)
-        role: User role (ADMIN | DEVELOPER)
+        role: User role (ADMIN | DEVELOPER | CLIENT)
         team_id: Team reference (only for DEVELOPER role)
         is_active: Account status
         created: Account creation timestamp
@@ -44,8 +45,9 @@ class User(SQLModel, table=True):
     email: str = Field(unique=True, index=True, max_length=255)
     name: str = Field(max_length=100)
     password: str = Field(max_length=255)
-    role: Roles = Field(default=Roles.DEVELOPER)
-    team_id: str | None = Field(default=None, foreign_key="teams.name", max_length=100)
+    role: Roles = Field(default=Roles.CLIENT)
+    team_id: Optional[str] = Field(
+        default=None, foreign_key="teams.name", max_length=100)
     is_active: bool = Field(default=True)
     created: datetime = Field(default_factory=datetime.now)
 

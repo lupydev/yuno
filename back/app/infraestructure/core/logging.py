@@ -234,8 +234,7 @@ def log_function_call(logger: logging.Logger):
 
     def decorator(func):
         async def async_wrapper(*args, **kwargs):
-            logger.debug(
-                f"Calling {func.__name__} with args={args}, kwargs={kwargs}")
+            logger.debug(f"Calling {func.__name__} with args={args}, kwargs={kwargs}")
             try:
                 result = await func(*args, **kwargs)
                 logger.debug(f"{func.__name__} completed successfully")
@@ -245,8 +244,7 @@ def log_function_call(logger: logging.Logger):
                 raise
 
         def sync_wrapper(*args, **kwargs):
-            logger.debug(
-                f"Calling {func.__name__} with args={args}, kwargs={kwargs}")
+            logger.debug(f"Calling {func.__name__} with args={args}, kwargs={kwargs}")
             try:
                 result = func(*args, **kwargs)
                 logger.debug(f"{func.__name__} completed successfully")

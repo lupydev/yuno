@@ -16,17 +16,17 @@ class UserBase(BaseModel):
     """Base user schema"""
 
     email: EmailStr = Field(..., description="User email")
-    name: str = Field(..., min_length=1, max_length=100, description="User name")
+    name: str = Field(..., min_length=1, max_length=100,
+                      description="User name")
 
 
 class UserCreate(UserBase):
     """User creation schema"""
 
     password: str = Field(..., min_length=8, description="User password")
-    role: Roles = Field(default=Roles.DEVELOPER, description="User role")
+    role: Roles = Field(default=Roles.CLIENT, description="User role")
     team_id: str | None = Field(
-        None, max_length=100, description="Team name (only for DEVELOPER role)"
-    )
+        None, max_length=100, description="Team name (only for DEVELOPER role)")
 
     model_config = {
         "json_schema_extra": {
@@ -34,7 +34,7 @@ class UserCreate(UserBase):
                 "email": "user@example.com",
                 "name": "John Doe",
                 "password": "securepass123",
-                "role": "DEVELOPER",
+                "role": "CLIENT",
                 "team_id": None,
             }
         }
@@ -45,10 +45,13 @@ class UserUpdate(BaseModel):
     """User update schema"""
 
     email: EmailStr | None = Field(None, description="User email")
-    name: str | None = Field(None, min_length=1, max_length=100, description="User name")
-    password: str | None = Field(None, min_length=8, description="User password")
+    name: str | None = Field(
+        None, min_length=1, max_length=100, description="User name")
+    password: str | None = Field(
+        None, min_length=8, description="User password")
     role: Roles | None = Field(None, description="User role")
-    team_id: UUID | None = Field(None, description="Team UUID (only for DEVELOPER role)")
+    team_id: str | None = Field(
+        None, description="Team name (only for DEVELOPER/TEAM_LEADER roles)")
     is_active: bool | None = Field(None, description="Account status")
 
     model_config = {

@@ -3,7 +3,7 @@ import axios from "axios";
 const apiBackClient = axios.create({
     baseURL:
         import.meta.env.VITE_API_BASE_URL ||
-        "https://sara-bi-back-658525748312.us-east1.run.app/api",
+        "http://localhost:8000/api",
     timeout: import.meta.env.VITE_API_TIMEOUT
         ? Number.parseInt(import.meta.env.VITE_API_TIMEOUT)
         : 30000,

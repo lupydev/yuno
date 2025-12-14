@@ -21,14 +21,8 @@ depends_on: Union[str, Sequence[str], None] = None
 
 def upgrade() -> None:
     """Upgrade schema."""
-    # Create roles enum type (idempotent)
-    op.execute("""
-        DO $$ BEGIN
-            CREATE TYPE roles AS ENUM ('ADMIN', 'DEVELOPER');
-        EXCEPTION
-            WHEN duplicate_object THEN null;
-        END $$;
-    """)
+    # Create roles enum type
+    op.execute("CREATE TYPE roles AS ENUM ('ADMIN', 'CLIENT')")
 
     # Create users table
     op.create_table(
@@ -40,7 +34,7 @@ def upgrade() -> None:
             length=100), nullable=False),
         sa.Column('password', sqlmodel.sql.sqltypes.AutoString(
             length=255), nullable=False),
-        sa.Column('role', postgresql.ENUM('ADMIN', 'DEVELOPER',
+        sa.Column('role', postgresql.ENUM('ADMIN', 'CLIENT',
                   name='roles', create_type=False), nullable=False),
         sa.Column('is_active', sa.Boolean(), nullable=False),
         sa.Column('created', sa.DateTime(), nullable=False),
