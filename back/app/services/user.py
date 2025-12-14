@@ -21,7 +21,7 @@ class UserService:
         email: str,
         name: str,
         password: str,
-        role: Roles = Roles.CLIENT,
+        role: Roles = Roles.DEVELOPER,
         team_id: str | None = None,
     ) -> User:
         """
@@ -154,9 +154,7 @@ class UserService:
 
         if email is not None:
             # Validate unique email
-            existing = db.exec(
-                select(User).where(User.email == email, User.id != user_id)
-            ).first()
+            existing = db.exec(select(User).where(User.email == email, User.id != user_id)).first()
             if existing:
                 raise HTTPException(
                     status_code=status.HTTP_400_BAD_REQUEST,
