@@ -183,7 +183,7 @@ const TransactionReport: React.FC = () => {
                 {/* Header */}
                 <div className="flex items-center justify-between mb-4">
                     <div className="flex items-center gap-3 text-sm text-slate-400">
-                        <button onClick={() => navigate('/reports')} className="px-2 py-1 bg-slate-800/40 rounded-md text-slate-200 hover:bg-slate-800/60 transition">Reports</button>
+                        <button onClick={() => navigate('/reports')} className="px-2 py-1 report-breadcrumb bg-slate-800/40 rounded-md text-slate-200 hover:bg-slate-800/60 transition">Reports</button>
                         <span className="text-slate-500">/</span>
                         <button onClick={() => navigate(`/reports?merchant=${encodeURIComponent(reportData.cause.details?.clientName || '')}`)} className="text-slate-300 font-medium hover:underline">{reportData.cause.details?.clientName || 'Merchant'}</button>
                         <span className="text-slate-500">/</span>
@@ -191,13 +191,13 @@ const TransactionReport: React.FC = () => {
                     </div>
                     <button 
                         onClick={() => navigate('/reports')}
-                        className="group flex items-center gap-2 text-sm font-medium px-5 py-2.5 text-slate-200 hover:text-white bg-slate-800/60 hover:bg-slate-700/80 rounded-lg transition-all duration-200 border border-slate-600/60 hover:border-slate-500 shadow-lg shadow-black/20 hover:shadow-black/40"
+                        className="group flex items-center gap-2 text-sm font-medium px-5 py-2.5 bg-indigo-600 text-white hover:bg-indigo-700 rounded-lg transition-all duration-200 border border-transparent shadow-lg"
                     >
-                        <ArrowLeft size={16} className="transition-transform group-hover:-translate-x-1" />
+                        <ArrowLeft size={16} className="text-white transition-transform group-hover:-translate-x-1" />
                         <span>Back to list</span>
                     </button>
                 </div>
-                <div className="relative bg-gradient-to-b from-slate-900/60 to-slate-900/40 rounded-xl shadow-sm p-6 border border-slate-800/20 ring-1 ring-slate-700/30">
+                <div className="card-surface relative bg-gradient-to-b from-slate-900/60 to-slate-900/40 rounded-xl shadow-sm p-6 border border-slate-800/20 ring-1 ring-slate-700/30">
                     <div className="mb-3 flex items-center gap-3">
                         <span className="text-xs px-2 py-1 bg-indigo-600 text-white rounded-md">REPORT</span>
                         <span className="text-xs text-slate-400">Viewing detailed findings</span>
@@ -217,9 +217,9 @@ const TransactionReport: React.FC = () => {
                         </div>
                         <div className="flex items-center gap-2">
                             {reportData.humanChecked ? (
-                                <div className="flex items-center gap-2 px-3 py-2 bg-emerald-900/20 rounded-md border border-emerald-800/30">
-                                    <CheckCircle className="w-5 h-5 text-emerald-400" />
-                                    <span className="text-sm font-medium text-emerald-300">Human Verified</span>
+                                <div className="flex items-center gap-2 px-3 py-2 bg-emerald-700/20 rounded-md border border-emerald-600/40">
+                                    <CheckCircle className="w-5 h-5 text-emerald-500" />
+                                    <span className="text-sm font-medium text-emerald-400">Human Verified</span>
                                 </div>
                             ) : (
                                 <div className="flex items-center gap-2 px-3 py-2 bg-amber-900/20 rounded-md border border-amber-800/30">
@@ -237,7 +237,7 @@ const TransactionReport: React.FC = () => {
                                 <div className="flex items-start gap-4">
                                     <AlertCircle className="w-6 h-6 text-indigo-400 mt-1" />
                                     <div>
-                                        <h3 className="text-lg font-semibold text-indigo-200">AI Analysis — Recommended Action</h3>
+                                        <h3 className="text-lg font-semibold text-indigo-600">AI Analysis — Recommended Action</h3>
                                         <p className="text-sm text-slate-200 mt-2 leading-relaxed max-w-3xl">{reportData.aiDescription}</p>
                                     </div>
                                 </div>
@@ -259,14 +259,14 @@ const TransactionReport: React.FC = () => {
                 </div>
 
                 {/* Cause Analysis */}
-                <div className="bg-gradient-to-b from-slate-900/60 to-slate-900/40 rounded-xl shadow-sm p-6 border border-slate-800/20">
-                    <h2 className="text-xl font-bold text-gray-100 mb-4">Root Cause Analysis</h2>
+                <div className="card-surface bg-gradient-to-b from-slate-900/60 to-slate-900/40 rounded-xl shadow-sm p-6 border border-slate-800/20">
+                    <h2 className="text-xl font-bold chart-heading mb-4">Root Cause Analysis</h2>
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                         <div className="border border-slate-800/30 rounded-lg p-4 bg-slate-900/40">
                             <span className="text-sm font-medium text-slate-400">Responsible Party</span>
                             <p className="text-lg font-semibold text-white mt-1 capitalize">{reportData.cause.type}</p>
                             {reportData.cause.type === 'yuno' && reportData.cause.details?.yunoComponent && (
-                                <span className="inline-block mt-2 px-3 py-1 bg-purple-900/40 text-purple-300 text-xs font-medium rounded-full border border-purple-800">
+                                <span className="inline-block mt-2 px-3 py-1 bg-purple-700/20 text-purple-600 text-xs font-medium rounded-full border border-purple-600">
                   {reportData.cause.details.yunoComponent.toUpperCase()}
                 </span>
                             )}
@@ -280,7 +280,7 @@ const TransactionReport: React.FC = () => {
                                 <span className="text-sm font-medium text-slate-400">Missing Parameters</span>
                                 <div className="flex flex-wrap gap-2 mt-2">
                                     {reportData.cause.details.missingParams.map((param, idx) => (
-                                        <span key={idx} className="px-2 py-1 bg-red-900/50 text-red-300 text-xs font-mono rounded border border-red-800">
+                                        <span key={idx} className="px-2 py-1 bg-red-600/20 text-red-600 text-xs font-mono rounded border border-red-600">
                       {param}
                     </span>
                                     ))}
@@ -298,12 +298,12 @@ const TransactionReport: React.FC = () => {
                 {/* Solutions */}
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                     <div className="bg-gradient-to-br from-slate-900/50 to-slate-900/30 rounded-xl p-6 border border-slate-800/20 shadow-sm">
-                        <h2 className="text-xl font-bold text-white mb-4">AI Recommended Solution</h2>
+                        <h2 className="text-xl font-bold chart-heading mb-4">AI Recommended Solution</h2>
                         <p className="text-slate-300 leading-relaxed">{reportData.aiSolution}</p>
                     </div>
                     <div className="bg-gradient-to-br from-slate-900/50 to-slate-900/30 rounded-xl p-6 border border-slate-800/20 shadow-sm">
                         <div className="flex items-center justify-between mb-4">
-                            <h2 className="text-xl font-bold text-white">Human Solution</h2>
+                            <h2 className="text-xl font-bold chart-heading">Human Solution</h2>
                             <div className="text-sm text-slate-300">Executed by: <span className="font-medium text-white">{reportData.humanBy || '—'}</span></div>
                         </div>
                         <p className="text-slate-300 leading-relaxed">{reportData.humanSolution}</p>
@@ -323,7 +323,7 @@ const TransactionReport: React.FC = () => {
                     <div className="bg-gradient-to-b from-slate-900/60 to-slate-900/40 rounded-xl p-6 border border-slate-800/20 shadow-sm">
                         {activeChart === 'failed' && (
                             <>
-                                <h2 className="text-xl font-bold text-gray-100 mb-6">Failed Transactions by Hour</h2>
+                                <h2 className="text-xl font-bold chart-heading mb-6">Failed Transactions by Hour</h2>
                                 <ResponsiveContainer width="100%" height={300}>
                                     <BarChart data={reportData.failedTransactions}>
                                         <CartesianGrid strokeDasharray="3 3" stroke="#374151" />

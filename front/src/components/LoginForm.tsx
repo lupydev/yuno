@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { useAuth } from "../contexts/useAuth";
+import { useTheme } from '../contexts/ThemeContext';
 import { isAxiosError } from "axios";
 
 const Login: React.FC = () => {
@@ -13,6 +14,15 @@ const Login: React.FC = () => {
 
     const navigate = useNavigate();
     const { login } = useAuth();
+    const { theme, setTheme } = useTheme();
+
+    useEffect(() => {
+        // force dark theme on login page and restore previous on unmount
+        const prev = theme;
+        if (theme !== 'dark') setTheme('dark');
+        return () => { setTheme(prev); };
+    }, []);
+
 
     useEffect(() => {
         if (error) {

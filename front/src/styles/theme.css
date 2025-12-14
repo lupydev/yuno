@@ -1,0 +1,159 @@
+/* Light mode overrides when [data-theme="light"] is set on documentElement */
+
+[data-theme="light"] body {
+  background-color: #f3f4f6 !important; /* slightly greyish */
+}
+
+/* Ensure text classes that force white are dark in light mode */
+[data-theme="light"] .text-white,
+[data-theme="light"] .text-slate-100,
+[data-theme="light"] .text-slate-200,
+[data-theme="light"] .text-slate-300 {
+  color: #0f172a !important; /* dark text for readability */
+}
+
+/* Background surfaces */
+[data-theme="light"] .bg-slate-900 { background-color: #f3f4f6 !important; }
+/* Card surfaces should be pure white in light mode */
+[data-theme="light"] .bg-slate-950 { background-color: #ffffff !important; }
+[data-theme="light"] .bg-slate-800 { background-color: #ffffff !important; }
+
+
+/* Borders */
+[data-theme="light"] .border-slate-800 { border-color: #e2e8f0 !important; }
+
+/* Buttons and accents - revert general font override to previous color */
+[data-theme="light"] .bg-indigo-600 { background-color: #7c3aed !important; }
+[data-theme="light"] .text-slate-400 { color: #475569 !important; }
+
+/* Table header accent (subtle purple) */
+[data-theme="light"] .bg-slate-800\/50 { background-color: rgba(124,58,237,0.06) !important; }
+[data-theme="light"] thead th { color: #5b21a8 !important; }
+
+/* Cards */
+[data-theme="light"] .shadow-sm { box-shadow: 0 1px 2px rgba(2,6,23,0.04) !important; }
+
+/* Reduce contrast on hover in light mode (subtle purple) */
+[data-theme="light"] .hover\:bg-slate-800:hover { background-color: #f5e9ff !important; }
+
+/* Ensure links/buttons visible (light purple overlay) */
+[data-theme="light"] .hover\:bg-slate-800\/40:hover { background-color: rgba(124,58,237,0.06) !important; }
+
+/* Minimal fixes: adjust badge backgrounds to purple tints */
+[data-theme="light"] .bg-emerald-900\/20 { background-color: rgba(124,58,237,0.08) !important; }
+
+/* Profile avatar border */
+[data-theme="light"] .rounded-full { border: none !important; }
+
+/* Make sure svg strokes are visible */
+[data-theme="light"] svg { color: inherit; }
+
+/* Buttons text color for purple buttons: use white for contrast */
+.bg-indigo-600, .bg-indigo-700, .bg-indigo-500 {
+  color: #ffffff !important; /* force white */
+}
+.bg-indigo-600:hover, .bg-indigo-700:hover, .bg-indigo-500:hover {
+  color: #ffffff !important;
+}
+
+/* NOTE: Do not override svg path/line colors here to preserve the chart series colors in light mode */
+
+/* Make any element that uses a gradient from slate-900 render as solid white in light mode (cards) */
+[data-theme="light"] [class*="bg-gradient-to"][class*="from-slate-900"] {
+  background-image: none !important;
+  background-color: #ffffff !important;
+}
+
+/* Also handle gradients that use "to-slate-900" class */
+[data-theme="light"] [class*="bg-gradient-to"][class*="to-slate-900"] {
+  background-image: none !important;
+  background-color: #ffffff !important;
+}
+
+/* For safety, override common gradient utilities that include opacity suffix */
+[data-theme="light"] [class*="bg-gradient-to"][class*="from-slate-900/"] {
+  background-image: none !important;
+  background-color: #ffffff !important;
+}
+
+/* Chart-specific: ensure tooltip text and markers are white in light mode, but leave title/labels untouched */
+[data-theme="light"] .chart-root .chart-tooltip,
+[data-theme="light"] .chart-root .chart-tooltip * {
+  color: #ffffff !important;
+  fill: #ffffff !important;
+}
+
+/* Ensure tooltip background is dark in light mode (override bg-slate-800 mapping) */
+[data-theme="light"] .chart-root .chart-tooltip .bg-slate-800 {
+  background-color: rgba(15,23,42,0.95) !important; /* dark slate */
+  border-color: rgba(255,255,255,0.06) !important;
+}
+
+/* Make chart inner area white in light mode */
+[data-theme="light"] .chart-root .chart-area { background-color: #ffffff !important; border-color: #e6e6e6 !important; }
+
+/* time-range select in light mode: make white background but keep font colors unchanged */
+[data-theme="light"] .time-range-select {
+  background-color: #ffffff !important;
+  border-color: #e2e8f0 !important;
+}
+
+/* card-surface: ensure card panels are white */
+[data-theme="light"] .card-surface {
+  background-color: #ffffff !important;
+  border-color: #e6e6e6 !important;
+}
+
+/* Tooltip box override: ensure dark background and white text in light mode */
+[data-theme="light"] .chart-root .chart-tooltip-box {
+  background-color: rgba(15,23,42,0.95) !important;
+  color: #ffffff !important;
+  border-color: rgba(255,255,255,0.06) !important;
+}
+[data-theme="light"] .chart-root .chart-tooltip-box * { color: #ffffff !important; fill: #ffffff !important; }
+
+/* Breadcrumb Reports button in cards: white bg in light mode but keep text color as-is */
+[data-theme="light"] .report-breadcrumb { background-color: #ffffff !important; border-color: #e6e6e6 !important; }
+
+/* Ensure lightweight slate backgrounds with opacity become solid white in light mode (small panels) */
+[data-theme="light"] .bg-slate-900\/40,
+[data-theme="light"] .bg-slate-900\/30,
+[data-theme="light"] .bg-slate-900\/50,
+[data-theme="light"] .bg-slate-800\/40,
+[data-theme="light"] .bg-slate-800\/30 {
+  background-color: #ffffff !important;
+  background-image: none !important;
+}
+
+/* Chart headings: dark in light mode, white in dark */
+.chart-heading { color: #ffffff; }
+[data-theme="light"] .chart-heading { color: #0f172a !important; }
+
+/* Card surface tweak: make slightly lighter in dark mode for contrast */
+.card-surface { background-color: rgba(2,6,23,0.6); }
+@media (prefers-color-scheme: dark) {
+  .card-surface { background-color: rgba(255,255,255,0.03); }
+}
+
+
+/* Strong override: ensure purple buttons and any children always use white text in light mode */
+[data-theme="light"] button.bg-indigo-600,
+[data-theme="light"] button.bg-indigo-700,
+[data-theme="light"] button.bg-indigo-500,
+[data-theme="light"] a.bg-indigo-600,
+[data-theme="light"] a.bg-indigo-700,
+[data-theme="light"] a.bg-indigo-500,
+[data-theme="light"] .bg-indigo-600,
+[data-theme="light"] .bg-indigo-700,
+[data-theme="light"] .bg-indigo-500 {
+  color: #ffffff !important;
+  fill: #ffffff !important;
+}
+
+[data-theme="light"] .bg-indigo-600 *,
+[data-theme="light"] .bg-indigo-700 *,
+[data-theme="light"] .bg-indigo-500 * {
+  color: #ffffff !important;
+  fill: #ffffff !important;
+}
+

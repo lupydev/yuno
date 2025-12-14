@@ -1,6 +1,8 @@
 import React from 'react';
-import { LayoutDashboard, Activity, Users, Bell, Menu } from 'lucide-react';
-import { useNavigate } from 'react-router-dom';
+import { LayoutDashboard, Activity, Users, Bell, Menu, Sun, Moon } from 'lucide-react';
+import { useNavigate, useLocation } from 'react-router-dom';
+import logo from '../../assets/yunologo.png';
+import { useTheme } from '../../contexts/ThemeContext';
 
 interface SidebarProps {
     sidebarOpen: boolean;
@@ -9,6 +11,7 @@ interface SidebarProps {
 
 const Sidebar: React.FC<SidebarProps> = ({ sidebarOpen, setSidebarOpen }) => {
     const navigate = useNavigate();
+    const location = useLocation();
 
     const navItems = [
         { icon: LayoutDashboard, label: 'Overview', path: '/dashboard' },
@@ -17,40 +20,73 @@ const Sidebar: React.FC<SidebarProps> = ({ sidebarOpen, setSidebarOpen }) => {
     ];
 
     return (
-        <div className={`${sidebarOpen ? 'w-64' : 'w-20'} bg-slate-900 border-r border-slate-800 transition-all duration-300 flex flex-col`}>
+        <aside className={`${sidebarOpen ? 'w-56' : 'w-16'} bg-slate-900 border-r border-slate-800 transition-all duration-300 flex flex-col items-stretch`}>
             {/* Logo + Toggle */}
-            <div className="p-6 border-b border-slate-800 flex items-center justify-between">
-                {sidebarOpen && <div className="text-2xl font-bold text-white">YUNO</div>}
-                <button onClick={() => setSidebarOpen(!sidebarOpen)} className="p-2 hover:bg-slate-800 rounded-lg">
-                    <Menu className="w-5 h-5" />
-                </button>
-            </div>
+            <div className="px-4 py-5 border-b border-slate-800 flex items-center justify-between">
+                <div className="flex items-center gap-3">
+                    <div className="overflow-hidden rounded-md" style={{ width: sidebarOpen ? 144 : 36 }}>
+                        <img
+                            src={logo}
+                            alt="YUNO"
+                            style={{
+                                width: sidebarOpen ? 240 : 240,
+                                height: 'auto',
+                                objectFit: 'none',
+                                objectPosition: sidebarOpen ? 'left center' : 'center center',
+                                transition: 'all 200ms ease'
+                            }}
+                        />
+                    </div>
+                </div>
 
+                <div className="flex items-center gap-2">
+                    <button
+                        onClick={() => setSidebarOpen(!sidebarOpen)}
+                        className="p-2 rounded-md hover:bg-slate-800/60 transition"
+                        aria-label="Toggle sidebar"
+                        title="Toggle sidebar"
+                    >
+                        <Menu className="w-5 h-5 text-slate-300" />
+                    </button>
+                </div>
+            </div>
 
             {/* Navigation */}
-            <nav className="flex-1 p-4 space-y-2">
-                {navItems.map((item, idx) => (
-                    <button
-                        key={idx}
-                        onClick={() => navigate(item.path)}
-                        className={`w-full flex items-center gap-3 px-4 py-3 rounded-lg transition-colors
-                            ${item.label === 'Overview' ? 'bg-blue-600 text-white' : 'text-slate-400 hover:bg-slate-800 hover:text-slate-200'}
-                        `}
-                    >
-                        <item.icon className="w-5 h-5" />
-                        {sidebarOpen && <span className="font-medium">{item.label}</span>}
-                    </button>
-                ))}
+            <nav className="flex-1 px-2 py-4 space-y-1">
+                {navItems.map((item) => {
+                    const isActive = location.pathname.startsWith(item.path);
+                    const Icon = item.icon;
+                    return (
+                        <button
+                            key={item.path}
+                            onClick={() => navigate(item.path)}
+                            title={!sidebarOpen ? item.label : undefined}
+                            className={`flex items-center gap-3 w-full px-3 py-2 rounded-lg transition-colors ${isActive ? 'bg-slate-800/60 ring-1 ring-indigo-500' : 'hover:bg-slate-800/40'} text-slate-200`}
+                        >
+                            <Icon className={`w-5 h-5 ${isActive ? 'text-indigo-300' : 'text-slate-400'}`} />
+                            {sidebarOpen && <span className="text-sm font-medium">{item.label}</span>}
+                        </button>
+                    );
+                })}
             </nav>
 
-            {/* Notifications */}
-            <div className="p-4 border-t border-slate-800">
-                <button className="w-full flex items-center gap-3 px-4 py-3 rounded-lg text-slate-400 hover:bg-slate-800 hover:text-slate-200 transition-colors">
-                    <Bell className="w-5 h-5" />
-                    {sidebarOpen && <span className="font-medium">Notifications</span>}
+            {/* Footer / Notifications & Profile */}
+            <div className="px-3 py-4 border-t border-slate-800 flex items-center gap-3">
+                <button
+                    className={`p-2 rounded-md hover:bg-slate-800/40 transition ${sidebarOpen ? 'flex items-center gap-3' : ''}`}
+                    title={!sidebarOpen ? 'Notifications' : undefined}
+                >
+                    <Bell className="w-5 h-5 text-slate-300" />
+                    {sidebarOpen && <span className="text-sm text-slate-200">Notifications</span>}
                 </button>
+
+                {/* simple profile placeholder */}
+                <div className="ml-auto flex items-center gap-3">
+                    <div className="w-8 h-8 rounded-full bg-gradient-to-br from-indigo-600 to-purple-600 flex items-center justify-center text-white text-sm font-semibold">A</div>
+                    {sidebarOpen && <div className="text-sm text-slate-200">Alice</div>}
+                </div>
             </div>
-        </div>
+        </aside>
     );
 };
 
