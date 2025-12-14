@@ -7,7 +7,7 @@ Follows FastAPI best practices for API organization.
 
 from fastapi import APIRouter
 
-from app.api.routers import auth_router, payments_router
+from app.api.routers import auth_router, teams_router, users_router
 
 # Main API router
 api_router = APIRouter()
@@ -20,9 +20,15 @@ api_router.include_router(
 )
 
 api_router.include_router(
-    payments_router,
-    prefix="/payments",
-    tags=["Payments"],
+    teams_router,
+    prefix="/teams",
+    tags=["Teams"],
+)
+
+api_router.include_router(
+    users_router,
+    prefix="/users",
+    tags=["Users"],
 )
 
 __all__ = ["api_router"]

@@ -4,14 +4,12 @@ Authentication router
 Handles user login and token refresh endpoints.
 """
 
-from datetime import timedelta
-
-from fastapi import APIRouter, Depends, HTTPException, status
+from fastapi import APIRouter, HTTPException, status
 from sqlmodel import select
 
-from app.domain.schemas import LoginRequest, LoginResponse, TokenPayload, UserData
 from app.core.db import SessionDep
 from app.core.security import create_access_token, create_refresh_token, verify_password
+from app.domain.schemas import LoginRequest, LoginResponse, UserData
 from app.models import User
 
 router = APIRouter()

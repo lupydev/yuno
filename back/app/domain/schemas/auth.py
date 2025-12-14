@@ -31,7 +31,10 @@ class UserData(BaseModel):
     id: str = Field(..., description="User UUID")
     email: str = Field(..., description="User email")
     name: str = Field(..., description="User name")
-    role: str = Field(..., description="User role (ADMIN | CLIENT)")
+    role: str = Field(...,
+                      description="User role (ADMIN | DEVELOPER | CLIENT)")
+    team_id: str | None = Field(
+        None, description="Team name (only for DEVELOPER role)")
 
     model_config = {"from_attributes": True}
 
@@ -53,7 +56,7 @@ class LoginResponse(BaseModel):
                     "email": "admin@yknow.com",
                     "name": "John Doe",
                     "role": "ADMIN",
-                    "is_active": True,
+                    "team_id": None,
                 },
             }
         }
