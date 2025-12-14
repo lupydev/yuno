@@ -5,7 +5,6 @@ import { CheckCircle, AlertTriangle, XCircle, TrendingUp, TrendingDown } from 'l
 
 const DashboardAdmin: React.FC = () => {
     const [timeRange, setTimeRange] = useState('24h');
-    const [sidebarOpen, setSidebarOpen] = useState(true);
 
     // Mock global system status
     const globalStatus = 'yellow';
@@ -56,8 +55,6 @@ const DashboardAdmin: React.FC = () => {
 
     return (
         <div className="flex h-screen bg-slate-950 text-slate-100">
-            {/* Sidebar */}
-            <Sidebar sidebarOpen={sidebarOpen} setSidebarOpen={setSidebarOpen} />
 
             {/* Main Content */}
             <div className="flex-1 overflow-auto">

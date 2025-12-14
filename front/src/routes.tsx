@@ -1,19 +1,44 @@
-import { Routes, Route, Navigate } from "react-router-dom";
-import { Login } from "./pages/LoginPage.tsx";
-import DashboardAdmin from "./components/dashboards/DashboardAdmin.tsx";
-import { ReportsPage } from "./pages/ReportsPage.tsx";
-import { UsersPage } from "./pages/UsersPage.tsx";
+import { Routes, Route } from 'react-router-dom';
+import { DashboardLayout } from './components/dashboards/DashboardsLayout';
+import DashboardAdmin from './components/dashboards/DashboardAdmin';
+import UsersView from './components/UsersView';
+import { ReportsPage } from './pages/ReportsPage';
+import { Login } from './pages/LoginPage';
 
 export const AppRoutes = () => {
     return (
         <Routes>
-            <Route path="*" element={<Navigate to="/dashboard" />} />
-            <Route path="/" element={<Navigate to="/dashboard" />} />
             <Route path="/login" element={<Login />} />
-            <Route path="/dashboard" element={<DashboardAdmin />} />
-            <Route path="/reports" element={<ReportsPage />} />
-            <Route path="/users" element={<UsersPage />} />
 
+            <Route
+                path="/dashboard"
+                element={
+                    <DashboardLayout>
+                        <DashboardAdmin />
+                    </DashboardLayout>
+                }
+            />
+
+            <Route
+                path="/reports"
+                element={
+                    <DashboardLayout>
+                        <ReportsPage />
+                    </DashboardLayout>
+                }
+            />
+
+            <Route
+                path="/users"
+                element={
+                    <DashboardLayout>
+                        <UsersView />
+                    </DashboardLayout>
+                }
+            />
+
+            {/* Redirect unknown routes */}
+            <Route path="*" element={<DashboardLayout><DashboardAdmin /></DashboardLayout>} />
         </Routes>
     );
 };
