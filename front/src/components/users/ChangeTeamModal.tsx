@@ -19,7 +19,7 @@ export const ChangeTeamModal: React.FC<ChangeTeamModalProps> = ({
     const [selectedTeam, setSelectedTeam] = React.useState(currentTeam);
 
     const handleConfirm = () => {
-        if (selectedTeam && selectedTeam !== currentTeam) {
+        if (selectedTeam !== currentTeam) {
             onConfirm(selectedTeam);
         } else {
             onCancel();
