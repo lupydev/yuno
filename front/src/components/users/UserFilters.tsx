@@ -35,10 +35,10 @@ export const UserFilters: React.FC<UserFiltersProps> = ({
                 <Search className="absolute left-4 top-1/2 transform -translate-y-1/2 w-5 h-5 text-slate-400" />
                 <input
                     type="text"
-                    placeholder="Buscar por nombre o email..."
+                    placeholder="Search by name or email..."
                     value={searchTerm}
                     onChange={(e) => onSearchChange(e.target.value)}
-                    className="w-full pl-12 pr-4 py-2.5 bg-slate-900 border border-slate-800 rounded-lg text-slate-200 placeholder-slate-500 focus:outline-none focus:border-blue-600"
+                    className="w-full pl-12 pr-4 py-2.5 bg-slate-900 border border-slate-800 rounded-lg text-slate-200 placeholder-slate-500 focus:outline-none focus:border-indigo-600"
                 />
             </div>
 
@@ -48,11 +48,11 @@ export const UserFilters: React.FC<UserFiltersProps> = ({
                     onClick={() => setShowTeamDropdown(!showTeamDropdown)}
                     className={`w-full px-4 py-2.5 rounded-lg border text-sm font-medium transition-all flex items-center justify-between gap-2 ${
                         selectedTeam
-                            ? 'bg-purple-600 border-purple-600 text-white'
+                            ? 'bg-indigo-600 border-indigo-600 text-white'
                             : 'bg-slate-900 border-slate-800 text-slate-300 hover:border-slate-700'
                     }`}
                 >
-                    <span>{selectedTeam || 'Filtrar por equipo'}</span>
+                    <span>{selectedTeam || 'Filter by team'}</span>
                     {selectedTeam ? (
                         <X
                             className="w-4 h-4"
@@ -71,7 +71,7 @@ export const UserFilters: React.FC<UserFiltersProps> = ({
                                 onClick={() => handleTeamSelect(team)}
                                 className={`w-full px-4 py-2 text-left text-sm transition-colors ${
                                     selectedTeam === team
-                                        ? 'bg-purple-600 text-white'
+                                        ? 'bg-indigo-600 text-white'
                                         : 'text-slate-300 hover:bg-slate-700'
                                 }`}
                             >
@@ -91,7 +91,7 @@ export const UserFilters: React.FC<UserFiltersProps> = ({
                     }}
                     className="px-4 py-2.5 text-sm text-slate-400 hover:text-white transition-colors whitespace-nowrap"
                 >
-                    Limpiar filtros
+                    Clear filters
                 </button>
             )}
         </div>

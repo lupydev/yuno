@@ -31,10 +31,10 @@ export const ChangeTeamModal: React.FC<ChangeTeamModalProps> = ({
             <div className="bg-slate-900 border border-slate-800 rounded-xl w-full max-w-md shadow-2xl">
                 <div className="flex items-center justify-between p-6 border-b border-slate-800">
                     <div className="flex items-center gap-3">
-                        <div className="p-2 bg-purple-500/10 rounded-lg">
-                            <ArrowLeftRight className="w-5 h-5 text-purple-400" />
+                        <div className="p-2 bg-indigo-500/10 rounded-lg">
+                            <ArrowLeftRight className="w-5 h-5 text-indigo-400" />
                         </div>
-                        <h2 className="text-xl font-bold text-white">Cambiar Equipo</h2>
+                        <h2 className="text-xl font-bold text-white">Change Team</h2>
                     </div>
                     <button
                         onClick={onCancel}
@@ -46,20 +46,20 @@ export const ChangeTeamModal: React.FC<ChangeTeamModalProps> = ({
 
                 <div className="p-6">
                     <p className="text-slate-300 mb-2">
-                        Usuario: <span className="font-semibold text-white">{userName}</span>
+                        User: <span className="font-semibold text-white">{userName}</span>
                     </p>
                     <p className="text-slate-400 text-sm mb-4">
-                        Equipo actual: <span className="text-purple-400 font-medium">{currentTeam}</span>
+                        Current team: <span className="text-indigo-400 font-medium">{currentTeam}</span>
                     </p>
 
                     <div>
                         <label className="block text-sm font-medium text-slate-300 mb-2">
-                            Seleccionar nuevo equipo
+                            Select new team
                         </label>
                         <select
                             value={selectedTeam}
                             onChange={(e) => setSelectedTeam(e.target.value)}
-                            className="w-full px-4 py-2.5 bg-slate-800 border border-slate-700 rounded-lg text-slate-200 focus:outline-none focus:border-purple-600"
+                            className="w-full px-4 py-2.5 bg-slate-800 border border-slate-700 rounded-lg text-slate-200 focus:outline-none focus:border-indigo-600"
                         >
                             {teams.map(team => (
                                 <option key={team} value={team}>{team}</option>
@@ -72,14 +72,14 @@ export const ChangeTeamModal: React.FC<ChangeTeamModalProps> = ({
                             onClick={onCancel}
                             className="flex-1 px-4 py-2 bg-slate-800 hover:bg-slate-700 text-slate-300 rounded-lg font-medium transition-colors"
                         >
-                            Cancelar
+                            Cancel
                         </button>
                         <button
                             onClick={handleConfirm}
                             disabled={selectedTeam === currentTeam}
-                            className="flex-1 px-4 py-2 bg-purple-600 hover:bg-purple-700 text-white rounded-lg font-medium transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+                            className="flex-1 px-4 py-2 bg-indigo-600 hover:bg-indigo-700 text-white rounded-lg font-medium transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
                         >
-                            Cambiar Equipo
+                            Change Team
                         </button>
                     </div>
                 </div>

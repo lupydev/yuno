@@ -45,19 +45,19 @@ export const UsersPage: React.FC = () => {
             // Mapear datos del backend al formato esperado
             const mappedUsers = response.data.map((user: any) => ({
                 id: user.id,
-                name: user.name || 'Sin nombre',
+                name: user.name || 'No name',
                 email: user.email,
-                team: user.team_id || 'Sin equipo',
+                team: user.team_id || 'No team',
                 role: user.role,
-                // Mapear is_active (boolean) del backend a status (string) del frontend
+                // Map is_active (boolean) from backend to status (string) in frontend
                 status: user.is_active ? 'active' : 'inactive',
                 createdAt: user.created_at
             }));
             setUsers(mappedUsers);
             setError("");
         } catch (err) {
-            console.error("Error al cargar usuarios:", err);
-            setError("Error al cargar los usuarios");
+            console.error("Error loading users:", err);
+            setError("Error loading users");
         } finally {
             setIsLoading(false);
         }
@@ -101,8 +101,8 @@ export const UsersPage: React.FC = () => {
             // Trigger para refrescar la tabla de equipos
             window.dispatchEvent(new Event('teamsUpdated'));
         } catch (err: any) {
-            console.error('Error al crear equipo:', err);
-            alert(err.response?.data?.detail || 'Error al crear el equipo');
+            console.error('Error creating team:', err);
+            alert(err.response?.data?.detail || 'Error creating team');
             throw err;
         }
     };
@@ -113,8 +113,8 @@ export const UsersPage: React.FC = () => {
             await fetchUsers();
             setShowCreateUser(false);
         } catch (err: any) {
-            console.error('Error al crear usuario:', err);
-            alert(err.response?.data?.detail || 'Error al crear el usuario');
+            console.error('Error creating user:', err);
+            alert(err.response?.data?.detail || 'Error creating user');
             throw err;
         }
     };
@@ -148,8 +148,8 @@ export const UsersPage: React.FC = () => {
             await fetchUsers();
             setEditingUser(null);
         } catch (err: any) {
-            console.error('Error al actualizar usuario:', err);
-            alert(err.response?.data?.detail || 'Error al actualizar el usuario');
+            console.error('Error updating user:', err);
+            alert(err.response?.data?.detail || 'Error updating user');
         }
     };
 
@@ -164,8 +164,8 @@ export const UsersPage: React.FC = () => {
             await fetchUsers();
             setDeletingUserId(null);
         } catch (err: any) {
-            console.error('Error al eliminar usuario:', err);
-            alert(err.response?.data?.detail || 'Error al eliminar el usuario');
+            console.error('Error deleting user:', err);
+            alert(err.response?.data?.detail || 'Error deleting user');
         }
     };
 
@@ -180,15 +180,15 @@ export const UsersPage: React.FC = () => {
             await fetchUsers();
             setChangingTeamUser(null);
         } catch (err: any) {
-            console.error('Error al cambiar equipo:', err);
-            alert(err.response?.data?.detail || 'Error al cambiar el equipo');
+            console.error('Error changing team:', err);
+            alert(err.response?.data?.detail || 'Error changing team');
         }
     };
 
     if (isLoading) {
         return (
             <div className="flex items-center justify-center h-full">
-                <p className="text-lg text-white">Cargando usuarios...</p>
+                <p className="text-lg text-white">Loading users...</p>
             </div>
         );
     }
@@ -206,8 +206,8 @@ export const UsersPage: React.FC = () => {
             {/* Header */}
             <div className="flex items-center justify-between mb-8">
                 <div>
-                    <h1 className="text-3xl font-bold text-white">Gestión de Usuarios</h1>
-                    <p className="text-slate-400 mt-1">Administra usuarios, equipos y asignaciones</p>
+                    <h1 className="text-3xl font-bold text-white">User Management</h1>
+                    <p className="text-slate-400 mt-1">Manage users, teams and assignments</p>
                 </div>
                 <UserActionButtons 
                     onCreateGroup={handleCreateGroup}
@@ -242,19 +242,19 @@ export const UsersPage: React.FC = () => {
             {/* Estadísticas */}
             <div className="grid grid-cols-3 gap-4 mt-6">
                 <div className="bg-slate-900 border border-slate-800 rounded-xl p-5">
-                    <div className="text-slate-400 text-sm font-medium mb-1">Total Usuarios</div>
+                    <div className="text-slate-400 text-sm font-medium mb-1">Total Users</div>
                     <div className="text-2xl font-bold text-white">{users.length}</div>
                 </div>
                 <div className="bg-slate-900 border border-slate-800 rounded-xl p-5">
-                    <div className="text-slate-400 text-sm font-medium mb-1">Usuarios Activos</div>
+                    <div className="text-slate-400 text-sm font-medium mb-1">Active Users</div>
                     <div className="text-2xl font-bold text-emerald-400">
                         {users.filter(u => u.status === 'active').length}
                     </div>
                 </div>
                 <div className="bg-slate-900 border border-slate-800 rounded-xl p-5">
-                    <div className="text-slate-400 text-sm font-medium mb-1">Equipos</div>
-                    <div className="text-2xl font-bold text-purple-400">
-                        {new Set(users.map(u => u.team).filter(t => t && t !== 'Sin equipo')).size}
+                    <div className="text-slate-400 text-sm font-medium mb-1">Teams</div>
+                    <div className="text-2xl font-bold text-indigo-400">
+                        {new Set(users.map(u => u.team).filter(Boolean)).size}
                     </div>
                 </div>
             </div>
@@ -271,7 +271,7 @@ export const UsersPage: React.FC = () => {
 
             {deletingUserId && (
                 <DeleteConfirmModal
-                    userName={users.find(u => u.id === deletingUserId)?.name || 'este usuario'}
+                    userName={users.find(u => u.id === deletingUserId)?.name || 'this user'}
                     onConfirm={confirmDelete}
                     onCancel={() => setDeletingUserId(null)}
                 />
@@ -280,7 +280,7 @@ export const UsersPage: React.FC = () => {
             {changingTeamUser && (
                 <ChangeTeamModal
                     userName={changingTeamUser.name || changingTeamUser.email}
-                    currentTeam={changingTeamUser.team || 'Sin equipo'}
+                    currentTeam={changingTeamUser.team || 'No team'}
                     teams={teams}
                     onConfirm={confirmChangeTeam}
                     onCancel={() => setChangingTeamUser(null)}

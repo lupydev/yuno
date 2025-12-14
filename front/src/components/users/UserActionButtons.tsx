@@ -14,17 +14,17 @@ export const UserActionButtons: React.FC<UserActionButtonsProps> = ({
         <div className="flex items-center gap-3">
             <button
                 onClick={onCreateGroup}
-                className="px-4 py-2 bg-purple-600 hover:bg-purple-700 text-white rounded-lg font-medium flex items-center gap-2 transition-colors"
+                className="px-4 py-2 bg-indigo-600 hover:bg-indigo-700 text-white rounded-lg font-medium flex items-center gap-2 transition-colors"
             >
                 <Users className="w-4 h-4" />
-                Crear Grupo
+                New Team
             </button>
             <button
                 onClick={onCreateDeveloper}
-                className="px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-lg font-medium flex items-center gap-2 transition-colors"
+                className="px-4 py-2 bg-indigo-600 hover:bg-indigo-700 text-white rounded-lg font-medium flex items-center gap-2 transition-colors"
             >
                 <Plus className="w-4 h-4" />
-                Crear Developer
+                New Developer
             </button>
         </div>
     );
