@@ -1,45 +1,67 @@
+"""
+User service
+
+Handles user management logic.
+"""
+
 from uuid import UUID
 
-from app.core.db import SessionDep
-from app.core.security import hash_password
-from app.models.user import Roles, User
-from app.schemas.user import AdminUserUpdate, UserCreateInternal
 from fastapi import HTTPException, status
-from pydantic import EmailStr
-from sqlmodel import func, or_, select
+from sqlmodel import select
+
+from app.infraestructure.core.db import SessionDep
+from app.infraestructure.core.security import hash_password
+from app.models.user import Roles, User
 
 
 class UserService:
     @staticmethod
     def create_user(
         db: SessionDep,
-        current_user: UUID,
-        data: UserCreateInternal,
+        email: str,
+        name: str,
+        password: str,
+        role: Roles = Roles.CLIENT,
+        team_id: str | None = None,
     ) -> User:
-        """Create a new user under the tenant owner
+        """
+        Create a new user
 
         Args:
-            db (SessionDep): database session
-            current_user (UUID): tenant owner ID to assign to the new user
-            data (UserCreateInternal): data for creating the new user
-
-        Raises:
-            HTTPException: if the email already exists
+            db: Database session
+            email: User email
+            name: User name
+            password: Plain password
+            role: User role
+            team_id: Team UUID (only for DEVELOPER role)
 
         Returns:
-            User: the newly created user
+            Created user
+
+        Raises:
+            HTTPException: If email already exists or invalid team assignment
         """
         # Validate unique email
-        existing = db.exec(select(User).where(User.email == data.email)).one_or_none()
+        existing = db.exec(select(User).where(User.email == email)).first()
         if existing:
             raise HTTPException(
-                status_code=status.HTTP_400_BAD_REQUEST, detail="Email already exists"
+                status_code=status.HTTP_400_BAD_REQUEST,
+                detail="Email already exists",
+            )
+
+        # Validate team assignment
+        if team_id and role != Roles.DEVELOPER:
+            raise HTTPException(
+                status_code=status.HTTP_400_BAD_REQUEST,
+                detail="Only DEVELOPER role can be assigned to a team",
             )
 
         user = User(
-            **data.model_dump(exclude={"password"}),
-            hashed_password=hash_password(data.password),
-            owner_id=current_user,
+            email=email,
+            name=name,
+            password=hash_password(password),
+            role=role,
+            team_id=team_id,
         )
 
         db.add(user)
@@ -48,171 +70,139 @@ class UserService:
         return user
 
     @staticmethod
-    def get_users(
-        db: SessionDep,
-        current_user: UUID,
-        skip: int,
-        limit: int,
-        role: Roles | None = None,
-        search: str | None = None,
-    ) -> tuple[list[User], int]:
-        """Retrieve a paginated list of users for the tenant owner
+    def get_user(db: SessionDep, user_id: UUID) -> User:
+        """
+        Get user by ID
 
         Args:
-            db (SessionDep): database session
-            current_user (UUID): tenant owner ID for filtering
-            skip (int): number of items to skip
-            limit (int): number of items to retrieve
-            role (Roles | None): filter by role
-            search (str | None): search by name (first_name or last_name)
+            db: Database session
+            user_id: User UUID
 
         Returns:
-            tuple[list[User], int]: list of users and total count
-        """
-
-        # Base filter for tenant
-        base_filter = or_(
-            User.owner_id == current_user,  # usuarios del tenant
-            User.id == current_user,  # incluir al owner
-        )
-
-        # Build filters list
-        filters = [base_filter]
-
-        if role:
-            filters.append(User.role == role.value)  # type: ignore
-
-        if search:
-            search_filter = or_(
-                User.name.ilike(f"%{search}%"),  # type: ignore
-                User.surname.ilike(f"%{search}%"),  # type: ignore
-            )
-            filters.append(search_filter)
-
-        total_items = db.exec(select(func.count()).select_from(User).where(*filters)).one()
-
-        users = db.exec(select(User).where(*filters).offset(skip).limit(limit)).all()
-
-        return list(users), total_items
-
-    @staticmethod
-    def get_user_by_id(db: SessionDep, id: UUID, current_user: UUID) -> User:
-        """Retrieve a user by ID for the tenant owner
-
-        Args:
-            db (SessionDep): database session
-            id (UUID): user ID
-            current_user (UUID): tenant owner ID for validation
+            User instance
 
         Raises:
-            HTTPException: if the user is not found or does not belong to the tenant
-
-        Returns:
-            User: the retrieved user
+            HTTPException: If user not found
         """
-        user = db.get(User, id)
-
+        user = db.get(User, user_id)
         if not user:
-            raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="User not found")
-
+            raise HTTPException(
+                status_code=status.HTTP_404_NOT_FOUND,
+                detail="User not found",
+            )
         return user
 
     @staticmethod
-    def soft_delete_user(db: SessionDep, id: UUID, current_user: UUID):
-        """Soft delete a user by setting is_active to False
+    def list_users(
+        db: SessionDep,
+        skip: int = 0,
+        limit: int = 100,
+        role: Roles | None = None,
+    ) -> list[User]:
+        """
+        List all users with pagination and optional role filter
 
         Args:
-            db (SessionDep): database session
-            id (UUID): user ID
-            current_user (UUID): tenant owner ID for validation
+            db: Database session
+            skip: Number of records to skip
+            limit: Maximum number of records to return
+            role: Optional role filter
 
-        Raises:
-            HTTPException: if the user is not found or does not belong to the tenant
+        Returns:
+            List of users
         """
-        user = db.get(User, id)
+        statement = select(User)
 
-        if not user:
-            raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="User not found")
+        if role:
+            statement = statement.where(User.role == role)
 
-        user.is_active = False
-        db.add(user)
-        db.commit()
+        statement = statement.offset(skip).limit(limit)
+        users = db.exec(statement).all()
+        return list(users)
 
     @staticmethod
     def update_user(
         db: SessionDep,
         user_id: UUID,
-        data: AdminUserUpdate,
-        current_user: UUID,
-        user: User | None = None,
+        email: str | None = None,
+        name: str | None = None,
+        password: str | None = None,
+        role: Roles | None = None,
+        team_id: str | None = None,
+        is_active: bool | None = None,
     ) -> User:
-        """Update user information (name, surname, email, and role if allowed)
+        """
+        Update user information
 
         Args:
-            db (SessionDep): database session
-            user_id (UUID): ID of user to update
-            data: AdminUserUpdate data for updating the user
-            current_user (UUID): tenant owner ID for validation
-            user (User | None): pre-fetched user to avoid duplicate query (optional)
-
-        Raises:
-            HTTPException: if user not found or permission denied
+            db: Database session
+            user_id: User UUID
+            email: New email
+            name: New name
+            password: New password
+            role: New role
+            team_id: New team UUID
+            is_active: Account status
 
         Returns:
-            User: updated user
+            Updated user
+
+        Raises:
+            HTTPException: If user not found or validation fails
         """
-        # Si no se proporcionó el usuario, buscarlo
-        if user is None:
-            user = db.get(User, user_id)
+        user = UserService.get_user(db, user_id)
 
-            if not user:
-                raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="User not found")
+        if email is not None:
+            # Validate unique email
+            existing = db.exec(
+                select(User).where(User.email == email, User.id != user_id)
+            ).first()
+            if existing:
+                raise HTTPException(
+                    status_code=status.HTTP_400_BAD_REQUEST,
+                    detail="Email already exists",
+                )
+            user.email = email
 
-            # Determinar el ID del owner del tenant
-            user_current_user = UserService._get_current_user(user)
+        if name is not None:
+            user.name = name
 
-            # Validar que pertenezca al mismo tenant
-            if user_current_user != current_user:
-                raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="User not found")
+        if password is not None:
+            user.password = hash_password(password)
 
-        update_data = data.model_dump(exclude_unset=True)
+        if role is not None:
+            user.role = role
 
-        # Aplicar actualizaciones
-        for key, value in update_data.items():
-            setattr(user, key, value)
+        if team_id is not None:
+            # Validate team assignment
+            if role and role != Roles.DEVELOPER:
+                raise HTTPException(
+                    status_code=status.HTTP_400_BAD_REQUEST,
+                    detail="Only DEVELOPER role can be assigned to a team",
+                )
+            user.team_id = team_id
+
+        if is_active is not None:
+            user.is_active = is_active
 
         db.add(user)
         db.commit()
         db.refresh(user)
-
         return user
 
     @staticmethod
-    def get_user_by_email(db: SessionDep, email: EmailStr, current_user: UUID) -> User:
-        """Retrieve a user by email for the tenant owner
+    def delete_user(db: SessionDep, user_id: UUID) -> None:
+        """
+        Delete a user (soft delete by setting is_active to False)
 
         Args:
-            db (SessionDep): database session
-            email (EmailStr): user email
-            current_user (UUID): tenant owner ID for filtering
+            db: Database session
+            user_id: User UUID
 
         Raises:
-            HTTPException: if the user is not found or does not belong to the tenant
-
-        Returns:
-            User: the retrieved user
+            HTTPException: If user not found
         """
-        user = db.exec(
-            select(User).where(
-                User.email == email,
-                or_(
-                    User.owner_id == current_user,
-                    User.id == current_user,
-                ),
-            )
-        ).first()
-
-        if not user:
-            raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="User not found")
-
-        return user
+        user = UserService.get_user(db, user_id)
+        user.is_active = False
+        db.add(user)
+        db.commit()

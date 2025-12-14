@@ -10,10 +10,9 @@ from typing import Any
 from jose import JWTError, jwt
 from passlib.context import CryptContext
 
-from app.core.config import settings
+from app.infraestructure.core.config import settings
 
-# Password hashing context
-pwd_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
+pwd_context = CryptContext(schemes=["argon2", "bcrypt"], deprecated="auto")
 
 
 def hash_password(password: str) -> str:
@@ -25,8 +24,13 @@ def hash_password(password: str) -> str:
 
     Returns:
         Hashed password string
+
+    Note:
+        Bcrypt has a 72 byte limit. Passwords are truncated to 72 bytes
+        before hashing to avoid errors.
     """
-    return pwd_context.hash(password)
+    truncated_password = password[:72]
+    return pwd_context.hash(truncated_password)
 
 
 def verify_password(plain_password: str, hashed_password: str) -> bool:
@@ -39,8 +43,12 @@ def verify_password(plain_password: str, hashed_password: str) -> bool:
 
     Returns:
         True if password matches, False otherwise
+
+    Note:
+        Truncates password to 72 characters to match hashing behavior
     """
-    return pwd_context.verify(plain_password, hashed_password)
+    truncated_password = plain_password[:72]
+    return pwd_context.verify(truncated_password, hashed_password)
 
 
 def create_access_token(data: dict[str, Any], expires_delta: timedelta | None = None) -> str:

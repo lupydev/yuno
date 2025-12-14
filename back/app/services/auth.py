@@ -8,8 +8,12 @@ from fastapi import HTTPException, status
 from pydantic import EmailStr
 from sqlmodel import select
 
-from app.core.db import SessionDep
-from app.core.security import create_access_token, create_refresh_token, verify_password
+from app.infraestructure.core.db import SessionDep
+from app.infraestructure.core.security import (
+    create_access_token,
+    create_refresh_token,
+    verify_password,
+)
 from app.models import User
 
 

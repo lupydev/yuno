@@ -6,7 +6,7 @@ Handles user login and token refresh endpoints.
 
 from fastapi import APIRouter, status
 
-from app.core.db import SessionDep
+from app.infraestructure.core.db import SessionDep
 from app.domain.schemas import LoginRequest, LoginResponse, UserData
 from app.services.auth import AuthService
 
