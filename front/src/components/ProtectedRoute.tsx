@@ -6,7 +6,7 @@ interface ProtectedRouteProps {
 }
 
 export const ProtectedRoute = ({ allowedRoles }: ProtectedRouteProps) => {
-    const { isAuthenticated, role } = true;
+    const { isAuthenticated, role } = useAuth();
 
     if (!isAuthenticated) {
         return <Navigate to="/login" replace />;
@@ -14,5 +14,5 @@ export const ProtectedRoute = ({ allowedRoles }: ProtectedRouteProps) => {
 
     const isAllowed = role ? allowedRoles.includes(role) : false;
 
-    return isAllowed ? <Outlet /> : <Navigate to="/Login" replace />;
+    return isAllowed ? <Outlet /> : <Navigate to="/login" replace />;
 };
