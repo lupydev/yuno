@@ -1,6 +1,7 @@
 import React, { useState, useRef } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { BarChart, Bar, LineChart, Line, PieChart, Pie, Cell, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer } from 'recharts';
-import { CheckCircle, AlertCircle, Clock, BarChart3, Eye, EyeOff } from 'lucide-react';
+import { CheckCircle, AlertCircle, Clock, BarChart3, Eye, EyeOff, ArrowLeft } from 'lucide-react';
 
 interface ReportData {
     title: string;
@@ -28,6 +29,7 @@ interface ReportData {
 }
 
 const TransactionReport: React.FC = () => {
+    const navigate = useNavigate();
     const [reportData] = useState<ReportData>({
         title: 'Payment Gateway Timeout Issue',
         aiDescription: 'Detected recurring timeout errors in payment processing between 14:00-18:00, affecting approximately 23% of transactions. The issue appears to be related to increased latency in the payment provider integration layer.',
@@ -187,7 +189,13 @@ const TransactionReport: React.FC = () => {
                         <span className="text-slate-500">/</span>
                         <span className="text-slate-300">{reportData.title}</span>
                     </div>
-                    <button className="text-sm px-3 py-1 bg-slate-800/40 rounded-md hover:bg-slate-800/50">Back to list</button>
+                    <button 
+                        onClick={() => navigate('/reports')}
+                        className="group flex items-center gap-2 text-sm font-medium px-5 py-2.5 text-slate-200 hover:text-white bg-slate-800/60 hover:bg-slate-700/80 rounded-lg transition-all duration-200 border border-slate-600/60 hover:border-slate-500 shadow-lg shadow-black/20 hover:shadow-black/40"
+                    >
+                        <ArrowLeft size={16} className="transition-transform group-hover:-translate-x-1" />
+                        <span>Back to list</span>
+                    </button>
                 </div>
                 <div className="relative bg-gradient-to-b from-slate-900/60 to-slate-900/40 rounded-xl shadow-sm p-6 border border-slate-800/20 ring-1 ring-slate-700/30">
                     <div className="mb-3 flex items-center gap-3">

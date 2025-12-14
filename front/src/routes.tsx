@@ -3,6 +3,7 @@ import { ProtectedRoute } from "./components/ProtectedRoute.tsx";
 import { Login } from "./pages/LoginPage.tsx";
 import { DashboardPage } from "./pages/DashboarPage.tsx";
 import { ReportsPage } from "./pages/ReportsPage.tsx";
+import { ReportPage } from "./pages/ReportPage.tsx";
 import { UsersPage } from "./pages/UsersPage.tsx";
 import { DashboardLayout } from "./components/dashboards/DashboardsLayout.tsx";
 
@@ -20,6 +21,7 @@ export const AppRoutes = () => {
                 >
                     <Route path="/dashboard" element={<DashboardPage />} />
                     <Route path="/reports" element={<ReportsPage />} />
+                    <Route path="/report/:transactionId" element={<ReportPage />} />
                 </Route>
 
                 {/* Routes only to ADMIN */}
