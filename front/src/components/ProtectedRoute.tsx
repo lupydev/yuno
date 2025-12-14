@@ -14,5 +14,5 @@ export const ProtectedRoute = ({ allowedRoles }: ProtectedRouteProps) => {
 
     const isAllowed = role ? allowedRoles.includes(role) : false;
 
-    return isAllowed ? <Outlet /> : <Navigate to="/Login" replace />;
+    return isAllowed ? <Outlet /> : <Navigate to="/login" replace />;
 };

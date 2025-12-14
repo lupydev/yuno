@@ -50,10 +50,10 @@ class UserService:
             )
 
         # Validate team assignment
-        if team_id and role != Roles.DEVELOPER:
+        if team_id and role not in (Roles.DEVELOPER, Roles.ADMIN):
             raise HTTPException(
                 status_code=status.HTTP_400_BAD_REQUEST,
-                detail="Only DEVELOPER role can be assigned to a team",
+                detail="Only DEVELOPER and ADMIN roles can be assigned to a team",
             )
 
         user = User(
@@ -174,11 +174,12 @@ class UserService:
             user.role = role
 
         if team_id is not None:
-            # Validate team assignment
-            if role and role != Roles.DEVELOPER:
+            # Validate team assignment - check current or new role
+            current_role = role if role is not None else user.role
+            if current_role not in (Roles.DEVELOPER, Roles.ADMIN):
                 raise HTTPException(
                     status_code=status.HTTP_400_BAD_REQUEST,
-                    detail="Only DEVELOPER role can be assigned to a team",
+                    detail="Only DEVELOPER and ADMIN roles can be assigned to a team",
                 )
             user.team_id = team_id
 
@@ -193,7 +194,7 @@ class UserService:
     @staticmethod
     def delete_user(db: SessionDep, user_id: UUID) -> None:
         """
-        Delete a user (soft delete by setting is_active to False)
+        Delete a user (hard delete)
 
         Args:
             db: Database session
@@ -203,6 +204,5 @@ class UserService:
             HTTPException: If user not found
         """
         user = UserService.get_user(db, user_id)
-        user.is_active = False
-        db.add(user)
+        db.delete(user)
         db.commit()
