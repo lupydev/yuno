@@ -1,5 +1,6 @@
 import React, { useState, useRef, useEffect } from 'react';
 import { Search, X, ChevronDown } from 'lucide-react';
+import { UI_MESSAGES } from '@/constants/reports';
 
 interface ReportFiltersProps {
     filters: {
@@ -47,9 +48,9 @@ export const ReportFilters: React.FC<ReportFiltersProps> = ({
     };
 
     const getProviderButtonText = () => {
-        if (filters.providers.length === 0) return 'All Providers';
+        if (filters.providers.length === 0) return UI_MESSAGES.FILTERS.ALL_PROVIDERS;
         if (filters.providers.length === 1) return filters.providers[0];
-        return `${filters.providers.length} Providers Selected`;
+        return UI_MESSAGES.FILTERS.PROVIDERS_SELECTED(filters.providers.length);
     };
 
     return (
@@ -72,7 +73,7 @@ export const ReportFilters: React.FC<ReportFiltersProps> = ({
                             }}
                             className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent text-sm"
                         >
-                            <option value="">All Merchants</option>
+                            <option value="">{UI_MESSAGES.FILTERS.ALL_MERCHANTS}</option>
                             {merchants.map((merchant) => (
                                 <option key={merchant} value={merchant}>
                                     {merchant}
@@ -122,7 +123,7 @@ export const ReportFilters: React.FC<ReportFiltersProps> = ({
                         className="flex items-center gap-2 px-4 py-2 text-sm font-medium text-gray-700 bg-gray-100 hover:bg-gray-200 rounded-lg transition-colors"
                     >
                         <X size={16} />
-                        Clear Filters
+                        {UI_MESSAGES.FILTERS.CLEAR_FILTERS}
                     </button>
                 )}
             </div>

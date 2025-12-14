@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import FilterBar from '../common/FilterBar';
-import { CheckCircle, AlertTriangle, XCircle, TrendingUp, TrendingDown } from 'lucide-react';
+import { CheckCircle, AlertTriangle, XCircle } from 'lucide-react';
 
 const DashboardAdmin: React.FC = () => {
     const [timeRange, setTimeRange] = useState('24h');

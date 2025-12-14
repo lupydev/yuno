@@ -2,6 +2,9 @@ import React from 'react';
 import { useNavigate } from 'react-router-dom';
 import { AlertCircle, CheckCircle, Clock, XCircle, TrendingUp } from 'lucide-react';
 import type { Report } from '@/types/report';
+import { getSeverityConfig, getStatusText } from './reportConfig';
+import { formatDate, formatNumber } from '@/utils/formatters';
+import { UI_MESSAGES } from '@/constants/reports';
 
 interface ReportsTableProps {
     reports: Report[];
@@ -24,51 +27,13 @@ export const ReportsTable: React.FC<ReportsTableProps> = ({ reports }) => {
         }
     };
 
-    const getStatusText = (status: string) => {
-        switch (status) {
-            case 'resolved':
-                return 'Resolved';
-            case 'in-progress':
-                return 'In Progress';
-            case 'rejected':
-                return 'Rejected';
-            case 'pending':
-            default:
-                return 'Pending';
-        }
-    };
-
     const getSeverityBadge = (severity: string) => {
-        const classes = {
-            low: 'bg-blue-100 text-blue-800',
-            medium: 'bg-yellow-100 text-yellow-800',
-            high: 'bg-orange-100 text-orange-800',
-            critical: 'bg-red-100 text-red-800'
-        };
-
-        const labels = {
-            low: 'Low',
-            medium: 'Medium',
-            high: 'High',
-            critical: 'Critical'
-        };
-
+        const config = getSeverityConfig(severity);
         return (
-            <span className={`px-2 py-1 rounded-full text-xs font-medium ${classes[severity as keyof typeof classes]}`}>
-                {labels[severity as keyof typeof labels]}
+            <span className={`px-2 py-1 rounded-full text-xs font-medium ${config.className}`}>
+                {config.label}
             </span>
         );
-    };
-
-    const formatDate = (dateString: string) => {
-        const date = new Date(dateString);
-        return new Intl.DateTimeFormat('en-US', {
-            day: '2-digit',
-            month: 'short',
-            year: 'numeric',
-            hour: '2-digit',
-            minute: '2-digit'
-        }).format(date);
     };
 
     const handleRowClick = (transactionId: string) => {
@@ -79,8 +44,8 @@ export const ReportsTable: React.FC<ReportsTableProps> = ({ reports }) => {
         return (
             <div className="bg-white rounded-lg shadow-sm p-12 text-center">
                 <AlertCircle size={48} className="text-gray-300 mx-auto mb-4" />
-                <p className="text-gray-500 text-lg">No reports found</p>
-                <p className="text-gray-400 text-sm mt-2">Try adjusting the filters</p>
+                <p className="text-gray-500 text-lg">{UI_MESSAGES.REPORTS.NO_REPORTS_FOUND}</p>
+                <p className="text-gray-400 text-sm mt-2">{UI_MESSAGES.REPORTS.TRY_ADJUSTING_FILTERS}</p>
             </div>
         );
     }
@@ -150,7 +115,7 @@ export const ReportsTable: React.FC<ReportsTableProps> = ({ reports }) => {
                                 <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-700">
                                     <div className="flex items-center gap-1">
                                         <TrendingUp size={14} className="text-red-500" />
-                                        {report.affectedTransactions.toLocaleString()}
+                                        {formatNumber(report.affectedTransactions)}
                                     </div>
                                 </td>
                                 <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
