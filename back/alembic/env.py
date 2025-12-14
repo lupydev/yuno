@@ -10,6 +10,7 @@ from sqlmodel import SQLModel
 
 # Import all models to register them with SQLModel metadata
 from app.domain.models.payment_event import NormalizedPaymentEvent  # noqa: F401
+from app.models.alert_report import AlertReport  # noqa: F401
 
 # this is the Alembic Config object, which provides
 # access to the values within the .ini file in use.
