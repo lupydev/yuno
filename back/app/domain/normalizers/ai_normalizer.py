@@ -242,24 +242,23 @@ class AIBasedNormalizer(INormalizer):
                 provider=ai_output.provider.lower(),
                 country=ai_output.country or "XX",  # Default country code
                 transactional_id=raw_event.get("transactional_id"),  # From Data Lake
-                # Status - ensure enum values are lowercase
+                # Status - convert to enum if string, ensure proper enum objects
                 status_category=(
-                    ai_output.status_category.value.lower()
+                    ai_output.status_category
                     if isinstance(ai_output.status_category, PaymentStatus)
-                    else ai_output.status_category.lower()
+                    else PaymentStatus(ai_output.status_category.lower())
                 ),
                 failure_reason=(
-                    ai_output.failure_reason.value.lower()
+                    ai_output.failure_reason
                     if isinstance(ai_output.failure_reason, FailureReason)
-                    and ai_output.failure_reason
-                    else ai_output.failure_reason.lower()
+                    else FailureReason(ai_output.failure_reason.lower())
                     if ai_output.failure_reason
                     else None
                 ),
                 error_source=(
-                    ai_output.error_source.value.lower()
-                    if isinstance(ai_output.error_source, ErrorSource) and ai_output.error_source
-                    else ai_output.error_source.lower()
+                    ai_output.error_source
+                    if isinstance(ai_output.error_source, ErrorSource)
+                    else ErrorSource(ai_output.error_source.lower())
                     if ai_output.error_source
                     else None
                 ),
