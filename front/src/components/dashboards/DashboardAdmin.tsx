@@ -255,7 +255,7 @@ const DashboardAdmin: React.FC = () => {
                         </div>
 
                         {/* Chart area */}
-                        <div className="relative h-80 bg-slate-950/50 rounded-lg pt-4 pb-8 px-6 border border-slate-800/50">
+                        <div className="chart-area relative h-80 bg-slate-950/50 rounded-lg pt-4 pb-8 px-6 border border-slate-800/50">
                             {/* Y-axis labels */}
                             <div className="absolute left-6 top-8 bottom-12 w-12 flex flex-col justify-between text-xs text-slate-500">
                                 <span>1,000</span>
@@ -313,7 +313,7 @@ const DashboardAdmin: React.FC = () => {
                                                 {/* Tooltip box positioned above total point */}
                                                 <div
                                                     style={{ left: `${xPerc}%`, top: `${topTotal}%`, transform: 'translate(-50%, -100%)' }}
-                                                    className="absolute pointer-events-none z-20"
+                                                    className="absolute pointer-events-none z-20 chart-tooltip"
                                                 >
                                                     <div className="bg-slate-800 border border-slate-700 rounded-lg p-3 shadow-xl text-left text-sm text-slate-200">
                                                         <div className="text-xs text-slate-400 mb-1">{d.time}</div>

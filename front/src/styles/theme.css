@@ -14,8 +14,9 @@
 
 /* Background surfaces */
 [data-theme="light"] .bg-slate-900 { background-color: #f3f4f6 !important; }
-[data-theme="light"] .bg-slate-950 { background-color: #f8fafc !important; }
-[data-theme="light"] .bg-slate-800 { background-color: #f1f5f9 !important; }
+/* Card surfaces should be pure white in light mode */
+[data-theme="light"] .bg-slate-950 { background-color: #ffffff !important; }
+[data-theme="light"] .bg-slate-800 { background-color: #ffffff !important; }
 
 
 /* Borders */
@@ -55,14 +56,36 @@
   color: #ffffff !important;
 }
 
-/* Chart-specific: keep tooltip and chart labels white in light mode */
-[data-theme="light"] .chart-root .text-white,
-[data-theme="light"] .chart-root .text-slate-200,
-[data-theme="light"] .chart-root .text-slate-300 {
-  color: #ffffff !important;
+/* NOTE: Do not override svg path/line colors here to preserve the chart series colors in light mode */
+
+/* Make any element that uses a gradient from slate-900 render as solid white in light mode (cards) */
+[data-theme="light"] [class*="bg-gradient-to"][class*="from-slate-900"] {
+  background-image: none !important;
+  background-color: #ffffff !important;
 }
 
-/* NOTE: Do not override svg path/line colors here to preserve the chart series colors in light mode */
+/* Also handle gradients that use "to-slate-900" class */
+[data-theme="light"] [class*="bg-gradient-to"][class*="to-slate-900"] {
+  background-image: none !important;
+  background-color: #ffffff !important;
+}
+
+/* For safety, override common gradient utilities that include opacity suffix */
+[data-theme="light"] [class*="bg-gradient-to"][class*="from-slate-900/"] {
+  background-image: none !important;
+  background-color: #ffffff !important;
+}
+
+/* Chart-specific: ensure tooltip text and markers are white in light mode, but leave title/labels untouched */
+[data-theme="light"] .chart-root .chart-tooltip,
+[data-theme="light"] .chart-root .chart-tooltip * {
+  color: #ffffff !important;
+  fill: #ffffff !important;
+}
+
+/* Make chart inner area white in light mode */
+[data-theme="light"] .chart-root .chart-area { background-color: #ffffff !important; border-color: #e6e6e6 !important; }
+
 
 /* Strong override: ensure purple buttons and any children always use white text in light mode */
 [data-theme="light"] button.bg-indigo-600,
