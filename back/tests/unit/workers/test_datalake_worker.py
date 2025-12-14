@@ -6,7 +6,7 @@ from uuid import uuid4
 
 import pytest
 
-from app.infraestructure.datalake.client import DataLakeQueryError
+from app.infraestructure.kafka.datalake.client import DataLakeQueryError
 from app.workers.datalake_worker import DataLakeWorker
 
 

@@ -7,7 +7,7 @@ from uuid import uuid4
 import pytest
 from sqlalchemy.exc import OperationalError
 
-from app.infraestructure.datalake.client import (
+from app.infraestructure.kafka.datalake.client import (
     DataLakeClient,
     DataLakeConnectionError,
     DataLakeQueryError,
@@ -25,12 +25,12 @@ class TestDataLakeClient:
     @pytest.fixture
     def client(self, mock_connection_url):
         """Cliente del data lake para testing"""
-        with patch("app.infraestructure.datalake.client.create_engine"):
+        with patch("app.infraestructure.kafka.datalake.client.create_engine"):
             return DataLakeClient(mock_connection_url)
 
     def test_init_success(self, mock_connection_url):
         """Test: Inicialización exitosa del cliente"""
-        with patch("app.infraestructure.datalake.client.create_engine") as mock_engine:
+        with patch("app.infraestructure.kafka.datalake.client.create_engine") as mock_engine:
             client = DataLakeClient(mock_connection_url)
 
             assert client is not None
@@ -45,7 +45,7 @@ class TestDataLakeClient:
     def test_init_invalid_url_raises_error(self):
         """Test: URL inválida debe lanzar DataLakeConnectionError"""
         with patch(
-            "app.infraestructure.datalake.client.create_engine",
+            "app.infraestructure.kafka.datalake.client.create_engine",
             side_effect=OperationalError("Mock error", None, None),
         ):
             with pytest.raises(DataLakeConnectionError, match="No se pudo conectar al data lake"):
@@ -67,7 +67,7 @@ class TestDataLakeClient:
         mock_row.created_at = mock_created_at
 
         # Mock session con SQLModel
-        with patch("app.infraestructure.datalake.client.Session") as mock_session:
+        with patch("app.infraestructure.kafka.datalake.client.Session") as mock_session:
             mock_session_instance = mock_session.return_value.__enter__.return_value
             mock_result = MagicMock()
             mock_result.all.return_value = [mock_row]
@@ -85,7 +85,7 @@ class TestDataLakeClient:
 
     def test_get_unprocessed_transactions_empty(self, client):
         """Test: No hay transacciones pendientes"""
-        with patch("app.infraestructure.datalake.client.Session") as mock_session:
+        with patch("app.infraestructure.kafka.datalake.client.Session") as mock_session:
             mock_session_instance = mock_session.return_value.__enter__.return_value
             mock_result = MagicMock()
             mock_result.all.return_value = []
@@ -97,7 +97,7 @@ class TestDataLakeClient:
 
     def test_get_unprocessed_transactions_query_error(self, client):
         """Test: Error al consultar transacciones"""
-        with patch("app.infraestructure.datalake.client.Session") as mock_session:
+        with patch("app.infraestructure.kafka.datalake.client.Session") as mock_session:
             mock_session_instance = mock_session.return_value.__enter__.return_value
             mock_session_instance.exec.side_effect = OperationalError("DB Error", None, None)
 
@@ -114,7 +114,7 @@ class TestDataLakeClient:
         mock_tx2 = MagicMock()
         mock_tx2.is_processed = False
 
-        with patch("app.infraestructure.datalake.client.Session") as mock_session:
+        with patch("app.infraestructure.kafka.datalake.client.Session") as mock_session:
             mock_session_instance = mock_session.return_value.__enter__.return_value
             mock_result = MagicMock()
             mock_result.all.return_value = [mock_tx1, mock_tx2]
@@ -137,7 +137,7 @@ class TestDataLakeClient:
         """Test: Error al marcar como procesadas"""
         tx_ids = [str(uuid4())]
 
-        with patch("app.infraestructure.datalake.client.Session") as mock_session:
+        with patch("app.infraestructure.kafka.datalake.client.Session") as mock_session:
             mock_session_instance = mock_session.return_value.__enter__.return_value
             # El error debe ocurrir en session.commit() después de exec()
             mock_result = MagicMock()
@@ -150,7 +150,7 @@ class TestDataLakeClient:
 
     def test_get_transaction_count_all(self, client):
         """Test: Contar todas las transacciones"""
-        with patch("app.infraestructure.datalake.client.Session") as mock_session:
+        with patch("app.infraestructure.kafka.datalake.client.Session") as mock_session:
             mock_session_instance = mock_session.return_value.__enter__.return_value
             mock_result = MagicMock()
             mock_result.one.return_value = 42
@@ -162,7 +162,7 @@ class TestDataLakeClient:
 
     def test_get_transaction_count_processed(self, client):
         """Test: Contar transacciones procesadas"""
-        with patch("app.infraestructure.datalake.client.Session") as mock_session:
+        with patch("app.infraestructure.kafka.datalake.client.Session") as mock_session:
             mock_session_instance = mock_session.return_value.__enter__.return_value
             mock_result = MagicMock()
             mock_result.one.return_value = 10
@@ -174,7 +174,7 @@ class TestDataLakeClient:
 
     def test_get_transaction_count_unprocessed(self, client):
         """Test: Contar transacciones no procesadas"""
-        with patch("app.infraestructure.datalake.client.Session") as mock_session:
+        with patch("app.infraestructure.kafka.datalake.client.Session") as mock_session:
             mock_session_instance = mock_session.return_value.__enter__.return_value
             mock_result = MagicMock()
             mock_result.one.return_value = 32
@@ -186,7 +186,7 @@ class TestDataLakeClient:
 
     def test_health_check_success(self, client):
         """Test: Health check exitoso"""
-        with patch("app.infraestructure.datalake.client.Session") as mock_session:
+        with patch("app.infraestructure.kafka.datalake.client.Session") as mock_session:
             mock_session_instance = mock_session.return_value.__enter__.return_value
             mock_result = MagicMock()
             mock_result.one.return_value = 0
@@ -198,7 +198,7 @@ class TestDataLakeClient:
 
     def test_health_check_failure(self, client):
         """Test: Health check falla"""
-        with patch("app.infraestructure.datalake.client.Session") as mock_session:
+        with patch("app.infraestructure.kafka.datalake.client.Session") as mock_session:
             mock_session_instance = mock_session.return_value.__enter__.return_value
             mock_session_instance.exec.side_effect = OperationalError(
                 "Connection failed", None, None

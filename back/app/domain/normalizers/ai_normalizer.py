@@ -39,7 +39,12 @@ from app.domain.exceptions import (
     RateLimitExceededException,
 )
 from app.domain.interfaces.normalizer import INormalizer
-from app.domain.models.enums import NormalizationMethod
+from app.domain.models.enums import (
+    ErrorSource,
+    FailureReason,
+    NormalizationMethod,
+    PaymentStatus,
+)
 from app.domain.models.payment_event import NormalizedPaymentEvent
 from app.domain.utils.currency_converter import convert_to_usd
 from app.infraestructure.ai.langchain_client import LangChainClient
@@ -285,7 +290,11 @@ class AIBasedNormalizer(INormalizer):
                 extra={
                     "provider": normalized_event.provider,
                     "transaction_id": normalized_event.provider_transaction_id,
-                    "status": normalized_event.status_category.value,
+                    "status": (
+                        normalized_event.status_category.value
+                        if isinstance(normalized_event.status_category, PaymentStatus)
+                        else normalized_event.status_category
+                    ),
                     "latency_ms": normalization_latency,
                 },
             )

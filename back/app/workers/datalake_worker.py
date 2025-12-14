@@ -14,7 +14,7 @@ from apscheduler.schedulers.background import BackgroundScheduler
 from apscheduler.triggers.interval import IntervalTrigger
 
 from app.infraestructure.core.config import settings
-from app.infraestructure.datalake.client import DataLakeClient, DataLakeQueryError
+from app.infraestructure.kafka.datalake.client import DataLakeClient, DataLakeQueryError
 from app.services.ingestion_orchestrator import IngestionOrchestrator
 
 logger = logging.getLogger(__name__)
