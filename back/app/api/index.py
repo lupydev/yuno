@@ -7,7 +7,7 @@ Follows FastAPI best practices for API organization.
 
 from fastapi import APIRouter
 
-from app.api.routers import auth_router, teams_router, users_router
+from app.api.routers import auth_router, notifications, teams_router, users_router
 
 # Main API router
 api_router = APIRouter()
@@ -29,6 +29,10 @@ api_router.include_router(
     users_router,
     prefix="/users",
     tags=["Users"],
+)
+
+api_router.include_router(
+    notifications.router,
 )
 
 __all__ = ["api_router"]
