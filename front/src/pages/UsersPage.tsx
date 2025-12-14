@@ -1,11 +1,22 @@
 import React, { useState, useEffect } from "react";
 import apiBackClient from "../services/apiBackClient";
+import { UserActionButtons } from "../components/users/UserActionButtons";
+import { UserFilters } from "../components/users/UserFilters";
+import { UsersTable } from "../components/users/UsersTable";
+import { EditUserModal } from "../components/users/EditUserModal";
+import { DeleteConfirmModal } from "../components/users/DeleteConfirmModal";
+import { ChangeTeamModal } from "../components/users/ChangeTeamModal";
+import { CreateTeamModal } from "../components/users/CreateTeamModal";
+import { CreateUserModal } from "../components/users/CreateUserModal";
+import { TeamsManagement } from "../components/users/TeamsManagement";
 
 interface User {
     id: string;
     email: string;
     role: string;
     name?: string;
+    team?: string;
+    status?: string;
     createdAt?: string;
 }
 
@@ -13,16 +24,36 @@ export const UsersPage: React.FC = () => {
     const [users, setUsers] = useState<User[]>([]);
     const [isLoading, setIsLoading] = useState(true);
     const [error, setError] = useState<string>("");
+    const [searchTerm, setSearchTerm] = useState("");
+    const [selectedTeam, setSelectedTeam] = useState<string | null>(null);
+    const [teams, setTeams] = useState<string[]>([]);
+    const [editingUser, setEditingUser] = useState<User | null>(null);
+    const [deletingUserId, setDeletingUserId] = useState<string | null>(null);
+    const [changingTeamUser, setChangingTeamUser] = useState<User | null>(null);
+    const [showCreateTeam, setShowCreateTeam] = useState(false);
+    const [showCreateUser, setShowCreateUser] = useState(false);
 
     useEffect(() => {
         fetchUsers();
+        fetchTeams();
     }, []);
 
     const fetchUsers = async () => {
         try {
             setIsLoading(true);
-            const response = await apiBackClient.get("/users");
-            setUsers(response.data);
+            const response = await apiBackClient.get("/users/");
+            // Mapear datos del backend al formato esperado
+            const mappedUsers = response.data.map((user: any) => ({
+                id: user.id,
+                name: user.name || 'Sin nombre',
+                email: user.email,
+                team: user.team_id || 'Sin equipo',
+                role: user.role,
+                // Mapear is_active (boolean) del backend a status (string) del frontend
+                status: user.is_active ? 'active' : 'inactive',
+                createdAt: user.created_at
+            }));
+            setUsers(mappedUsers);
             setError("");
         } catch (err) {
             console.error("Error al cargar usuarios:", err);
@@ -32,10 +63,140 @@ export const UsersPage: React.FC = () => {
         }
     };
 
+    const fetchTeams = async () => {
+        try {
+            const response = await apiBackClient.get("/teams/names/all");
+            // El endpoint devuelve directamente un array de strings
+            setTeams(response.data);
+        } catch (err) {
+            console.error("Error al cargar equipos:", err);
+            // Fallback a equipos por defecto en caso de error
+            setTeams([]);
+        }
+    };
+
+    // Filtrar usuarios
+    const filteredUsers = users.filter(user => {
+        const matchesSearch = !searchTerm || 
+            user.name?.toLowerCase().includes(searchTerm.toLowerCase()) ||
+            user.email.toLowerCase().includes(searchTerm.toLowerCase());
+        
+        const matchesTeam = !selectedTeam || user.team === selectedTeam;
+        
+        return matchesSearch && matchesTeam;
+    });
+
+    const handleCreateGroup = () => {
+        setShowCreateTeam(true);
+    };
+
+    const handleCreateDeveloper = () => {
+        setShowCreateUser(true);
+    };
+
+    const handleSaveTeam = async (name: string) => {
+        try {
+            await apiBackClient.post("/teams/", { name });
+            await fetchTeams();
+            setShowCreateTeam(false);
+            // Trigger para refrescar la tabla de equipos
+            window.dispatchEvent(new Event('teamsUpdated'));
+        } catch (err: any) {
+            console.error('Error al crear equipo:', err);
+            alert(err.response?.data?.detail || 'Error al crear el equipo');
+            throw err;
+        }
+    };
+
+    const handleCreateUser = async (userData: any) => {
+        try {
+            await apiBackClient.post("/users/", userData);
+            await fetchUsers();
+            setShowCreateUser(false);
+        } catch (err: any) {
+            console.error('Error al crear usuario:', err);
+            alert(err.response?.data?.detail || 'Error al crear el usuario');
+            throw err;
+        }
+    };
+
+    const handleEditUser = (user: User) => {
+        setEditingUser(user);
+    };
+
+    const handleSaveUser = async (updatedUser: User) => {
+        try {
+            // Construir objeto solo con campos que cambiaron
+            const updateData: any = {};
+            
+            const originalUser = users.find(u => u.id === updatedUser.id);
+            if (!originalUser) return;
+
+            if (updatedUser.name !== originalUser.name) {
+                updateData.name = updatedUser.name;
+            }
+            if (updatedUser.email !== originalUser.email) {
+                updateData.email = updatedUser.email;
+            }
+            // El rol siempre es DEVELOPER para developers
+            updateData.role = 'DEVELOPER';
+            
+            if (updatedUser.team !== originalUser.team) {
+                if (updatedUser.team && updatedUser.team !== 'Sin equipo') {
+                    updateData.team_id = updatedUser.team;
+                } else {
+                    updateData.team_id = null;
+                }
+            }
+            if (updatedUser.status !== originalUser.status) {
+                updateData.is_active = updatedUser.status === 'active';
+            }
+
+            await apiBackClient.patch(`/users/${updatedUser.id}`, updateData);
+            await fetchUsers();
+            setEditingUser(null);
+        } catch (err: any) {
+            console.error('Error al actualizar usuario:', err);
+            alert(err.response?.data?.detail || 'Error al actualizar el usuario');
+        }
+    };
+
+    const handleDeleteUser = (userId: string) => {
+        setDeletingUserId(userId);
+    };
+
+    const confirmDelete = async () => {
+        if (!deletingUserId) return;
+        try {
+            await apiBackClient.delete(`/users/${deletingUserId}`);
+            await fetchUsers();
+            setDeletingUserId(null);
+        } catch (err: any) {
+            console.error('Error al eliminar usuario:', err);
+            alert(err.response?.data?.detail || 'Error al eliminar el usuario');
+        }
+    };
+
+    const handleChangeTeam = (user: User) => {
+        setChangingTeamUser(user);
+    };
+
+    const confirmChangeTeam = async (newTeam: string) => {
+        if (!changingTeamUser) return;
+        try {
+            await apiBackClient.patch(`/users/${changingTeamUser.id}`, { team_id: newTeam });
+            await fetchUsers();
+            setChangingTeamUser(null);
+        } catch (err: any) {
+            console.error('Error al cambiar equipo:', err);
+            alert(err.response?.data?.detail || 'Error al cambiar el equipo');
+        }
+    };
+
     if (isLoading) {
         return (
             <div className="flex items-center justify-center h-full">
-                <p className="text-lg">Cargando usuarios...</p>
+                <p className="text-lg text-white">Cargando usuarios...</p>
             </div>
         );
     }
@@ -43,85 +204,112 @@ export const UsersPage: React.FC = () => {
     if (error) {
         return (
             <div className="flex items-center justify-center h-full">
-                <p className="text-lg text-red-500">{error}</p>
+                <p className="text-lg text-red-400">{error}</p>
             </div>
         );
     }
 
     return (
-        <div className="p-8">
-            <div className="mb-6">
-                <h1 className="text-3xl font-bold">Gestión de Usuarios</h1>
-                <p className="text-gray-600 mt-2">Administra los usuarios del sistema</p>
+        <div className="p-8 max-w-[1800px] mx-auto">
+            {/* Header */}
+            <div className="flex items-center justify-between mb-8">
+                <div>
+                    <h1 className="text-3xl font-bold text-white">Gestión de Usuarios</h1>
+                    <p className="text-slate-400 mt-1">Administra usuarios, equipos y asignaciones</p>
+                </div>
+                <UserActionButtons 
+                    onCreateGroup={handleCreateGroup}
+                    onCreateDeveloper={handleCreateDeveloper}
+                />
             </div>
 
-            <div className="bg-white rounded-lg shadow overflow-hidden">
-                <table className="min-w-full divide-y divide-gray-200">
-                    <thead className="bg-gray-50">
-                        <tr>
-                            <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                                Email
-                            </th>
-                            <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                                Nombre
-                            </th>
-                            <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                                Rol
-                            </th>
-                            <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                                Fecha de Creación
-                            </th>
-                            <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                                Acciones
-                            </th>
-                        </tr>
-                    </thead>
-                    <tbody className="bg-white divide-y divide-gray-200">
-                        {users.length === 0 ? (
-                            <tr>
-                                <td colSpan={5} className="px-6 py-4 text-center text-gray-500">
-                                    No hay usuarios registrados
-                                </td>
-                            </tr>
-                        ) : (
-                            users.map((user) => (
-                                <tr key={user.id} className="hover:bg-gray-50">
-                                    <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
-                                        {user.email}
-                                    </td>
-                                    <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
-                                        {user.name || "N/A"}
-                                    </td>
-                                    <td className="px-6 py-4 whitespace-nowrap">
-                                        <span className={`px-2 inline-flex text-xs leading-5 font-semibold rounded-full ${
-                                            user.role === "ADMIN"
-                                                ? "bg-purple-100 text-purple-800"
-                                                : user.role === "DEVELOPER"
-                                                ? "bg-blue-100 text-blue-800"
-                                                : "bg-green-100 text-green-800"
-                                        }`}>
-                                            {user.role}
-                                        </span>
-                                    </td>
-                                    <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
-                                        {user.createdAt
-                                            ? new Date(user.createdAt).toLocaleDateString()
-                                            : "N/A"}
-                                    </td>
-                                    <td className="px-6 py-4 whitespace-nowrap text-sm font-medium">
-                                        <button className="text-blue-600 hover:text-blue-900 mr-3">
-                                            Editar
-                                        </button>
-                                        <button className="text-red-600 hover:text-red-900">
-                                            Eliminar
-                                        </button>
-                                    </td>
-                                </tr>
-                            ))
-                        )}
-                    </tbody>
-                </table>
+            {/* Filtros */}
+            <div className="mb-6">
+                <UserFilters
+                    searchTerm={searchTerm}
+                    onSearchChange={setSearchTerm}
+                    selectedTeam={selectedTeam}
+                    onTeamChange={setSelectedTeam}
+                    teams={teams}
+                />
             </div>
+
+            {/* Tabla de usuarios */}
+            <UsersTable
+                users={filteredUsers}
+                onEdit={handleEditUser}
+                onDelete={handleDeleteUser}
+                onChangeTeam={handleChangeTeam}
+            />
+
+            {/* Gestión de Equipos */}
+            <div className="mt-8">
+                <TeamsManagement />
+            </div>
+
+            {/* Estadísticas */}
+            <div className="grid grid-cols-3 gap-4 mt-6">
+                <div className="bg-slate-900 border border-slate-800 rounded-xl p-5">
+                    <div className="text-slate-400 text-sm font-medium mb-1">Total Usuarios</div>
+                    <div className="text-2xl font-bold text-white">{users.length}</div>
+                </div>
+                <div className="bg-slate-900 border border-slate-800 rounded-xl p-5">
+                    <div className="text-slate-400 text-sm font-medium mb-1">Usuarios Activos</div>
+                    <div className="text-2xl font-bold text-emerald-400">
+                        {users.filter(u => u.status === 'active').length}
+                    </div>
+                </div>
+                <div className="bg-slate-900 border border-slate-800 rounded-xl p-5">
+                    <div className="text-slate-400 text-sm font-medium mb-1">Equipos</div>
+                    <div className="text-2xl font-bold text-purple-400">
+                        {new Set(users.map(u => u.team).filter(Boolean)).size}
+                    </div>
+                </div>
+            </div>
+
+            {/* Modales */}
+            {editingUser && (
+                <EditUserModal
+                    user={editingUser}
+                    teams={teams}
+                    onClose={() => setEditingUser(null)}
+                    onSave={handleSaveUser}
+                />
+            )}
+
+            {deletingUserId && (
+                <DeleteConfirmModal
+                    userName={users.find(u => u.id === deletingUserId)?.name || 'este usuario'}
+                    onConfirm={confirmDelete}
+                    onCancel={() => setDeletingUserId(null)}
+                />
+            )}
+
+            {changingTeamUser && (
+                <ChangeTeamModal
+                    userName={changingTeamUser.name || changingTeamUser.email}
+                    currentTeam={changingTeamUser.team || 'Sin equipo'}
+                    teams={teams}
+                    onConfirm={confirmChangeTeam}
+                    onCancel={() => setChangingTeamUser(null)}
+                />
+            )}
+
+            {showCreateTeam && (
+                <CreateTeamModal
+                    onClose={() => setShowCreateTeam(false)}
+                    onSave={handleSaveTeam}
+                />
+            )}
+
+            {showCreateUser && (
+                <CreateUserModal
+                    teams={teams}
+                    fixedRole="DEVELOPER"
+                    onClose={() => setShowCreateUser(false)}
+                    onSave={handleCreateUser}
+                />
+            )}
         </div>
     );
 };
