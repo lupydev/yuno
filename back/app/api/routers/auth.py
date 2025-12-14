@@ -7,9 +7,13 @@ Handles user login and token refresh endpoints.
 from fastapi import APIRouter, HTTPException, status
 from sqlmodel import select
 
-from app.core.db import SessionDep
-from app.core.security import create_access_token, create_refresh_token, verify_password
 from app.domain.schemas import LoginRequest, LoginResponse, UserData
+from app.infraestructure.core.db import SessionDep
+from app.infraestructure.core.security import (
+    create_access_token,
+    create_refresh_token,
+    verify_password,
+)
 from app.models import User
 
 router = APIRouter()
