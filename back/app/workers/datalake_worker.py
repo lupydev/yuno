@@ -40,7 +40,8 @@ class DataLakeWorker:
         self,
         datalake_client: DataLakeClient,
         orchestrator_factory: OrchestratorFactory,
-        interval_seconds: int = 60,
+        # TODO: cambiar a 60 para la demo
+        interval_seconds: int = 60 * 60 * 24,
     ) -> None:
         """
         Inicializa el worker con inyección de dependencias
