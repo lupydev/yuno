@@ -5,6 +5,8 @@ import { CheckCircle, AlertTriangle, XCircle, TrendingUp, TrendingDown } from 'l
 
 const DashboardAdmin: React.FC = () => {
     const [timeRange, setTimeRange] = useState('24h');
+    const [activeTab, setActiveTab] = useState<'dashboard'|'reports'>('dashboard');
+    const [selectedAlert, setSelectedAlert] = useState<number | null>(null);
 
     // Mock global system status
     const globalStatus = 'yellow';
@@ -54,7 +56,7 @@ const DashboardAdmin: React.FC = () => {
     const StatusIcon = statusConfig[globalStatus].icon;
 
     return (
-        <div className="flex h-screen bg-slate-950 text-slate-100">
+        <div className="flex h-screen bg-slate-900 text-slate-100 antialiased">
 
             {/* Main Content */}
             <div className="flex-1 overflow-auto">
@@ -66,22 +68,25 @@ const DashboardAdmin: React.FC = () => {
                             <h1 className="text-3xl font-bold text-white">Payment Health</h1>
                             <p className="text-slate-400 mt-1">Real-time overview of your payment performance</p>
                         </div>
-                        <select
-                            value={timeRange}
-                            onChange={(e) => setTimeRange(e.target.value)}
-                            className="px-4 py-2 border border-slate-700 rounded-lg bg-slate-800 text-slate-200 font-medium"
-                        >
-                            <option value="1h">Last Hour</option>
-                            <option value="24h">Last 24 Hours</option>
-                            <option value="7d">Last 7 Days</option>
-                        </select>
+                        <div className="flex items-center gap-3">
+                            <select
+                                value={timeRange}
+                                onChange={(e) => setTimeRange(e.target.value)}
+                                className="px-3 py-2 rounded-md bg-slate-800/60 text-slate-200 font-medium border border-transparent hover:border-slate-700 transition"
+                            >
+                                <option value="1h">Last Hour</option>
+                                <option value="24h">Last 24 Hours</option>
+                                <option value="7d">Last 7 Days</option>
+                            </select>
+                            <button className="px-3 py-2 rounded-md bg-indigo-600 hover:bg-indigo-700 text-white text-sm font-medium transition">Export</button>
+                        </div>
                     </div>
 
                     {/* Filters */}
                     <FilterBar />
 
                     {/* Chart */}
-                    <div className="bg-slate-900 border border-slate-800 rounded-xl p-6 mb-6">
+                    <div className="bg-gradient-to-b from-slate-900/60 to-slate-900/40 rounded-xl p-6 mb-6 shadow-sm border border-slate-800/20">
                         {/* Chart header & legend */}
                         <div className="flex items-center justify-between mb-6">
                             <div>
@@ -191,38 +196,60 @@ const DashboardAdmin: React.FC = () => {
                         </div>
                     </div>
 
-                    {/* Global Status + KPIs */}
-                    <div className="grid grid-cols-5 gap-4 mb-6">
-                        <div className={`col-span-1 ${statusConfig[globalStatus].bg} ${statusConfig[globalStatus].border} border rounded-xl p-5 flex flex-col items-center justify-center text-center`}>
-                            <StatusIcon className={`w-10 h-10 ${statusConfig[globalStatus].color} mb-2`} />
-                            <h3 className={`text-sm font-bold ${statusConfig[globalStatus].color}`}>
-                                {globalStatus === 'green' ? 'Healthy' : globalStatus === 'yellow' ? 'Warning' : 'Critical'}
-                            </h3>
-                            <p className="text-xs text-slate-400 mt-1">System Status</p>
-                        </div>
+                    {/* Global Status + Alerts */}
+                    {activeTab === 'dashboard' ? (
+                        <div className="grid grid-cols-5 gap-4 mb-6">
+                            <div className={`col-span-1 ${statusConfig[globalStatus].bg} ${statusConfig[globalStatus].border} border rounded-xl p-5 flex flex-col items-center justify-center text-center`}>
+                                <StatusIcon className={`w-10 h-10 ${statusConfig[globalStatus].color} mb-2`} />
+                                <h3 className={`text-sm font-bold ${statusConfig[globalStatus].color}`}>
+                                    {globalStatus === 'green' ? 'Healthy' : globalStatus === 'yellow' ? 'Warning' : 'Critical'}
+                                </h3>
+                                <p className="text-xs text-slate-400 mt-1">System Status</p>
+                            </div>
 
-                        {kpis.map((kpi, idx) => (
-                            <div key={idx} className="bg-slate-900 border border-slate-800 rounded-xl p-5">
-                                <div className="flex items-center justify-between mb-2">
-                                    <span className="text-slate-400 text-sm font-medium">{kpi.label}</span>
-                                    {kpi.status === 'error' && <XCircle className="w-4 h-4 text-red-400" />}
-                                    {kpi.status === 'warning' && <AlertTriangle className="w-4 h-4 text-amber-400" />}
-                                    {kpi.status === 'good' && <CheckCircle className="w-4 h-4 text-emerald-400" />}
-                                </div>
-                                <div className="text-2xl font-bold text-white mb-1">{kpi.value}</div>
-                                <div className="flex items-center gap-1">
-                                    {kpi.change > 0 ? (
-                                        <TrendingUp className={`w-3 h-3 ${kpi.status === 'good' ? 'text-emerald-400' : 'text-red-400'}`} />
-                                    ) : (
-                                        <TrendingDown className={`w-3 h-3 ${kpi.status === 'good' ? 'text-emerald-400' : 'text-red-400'}`} />
-                                    )}
-                                    <span className={`text-xs font-medium ${Math.abs(kpi.change) > 2 ? 'text-red-400' : 'text-slate-400'}`}>
-                                        {Math.abs(kpi.change)}% vs yesterday
-                                    </span>
+                            {kpis.map((kpi, idx) => (
+                                <button
+                                    key={idx}
+                                    onClick={() => { setSelectedAlert(idx); setActiveTab('reports'); }}
+                                    className={`text-left rounded-lg p-4 bg-gradient-to-br from-slate-800/60 to-slate-900/20 shadow-lg ring-1 ring-slate-700/40 hover:shadow-2xl transform hover:-translate-y-1 transition duration-150 border border-transparent ${kpi.status === 'error' ? 'border-l-red-500' : kpi.status === 'warning' ? 'border-l-amber-500' : 'border-l-emerald-500'}`}
+                                >
+                                    <div className="flex items-start justify-between">
+                                        <div>
+                                            <div className="flex items-center gap-2">
+                                                <span className={`w-2 h-2 rounded-full ${kpi.status === 'error' ? 'bg-red-500' : kpi.status === 'warning' ? 'bg-amber-400' : 'bg-emerald-400'}`} />
+                                                <span className="inline-block text-xs font-semibold text-amber-400">Alert</span>
+                                            </div>
+                                            <div className="mt-1 text-sm font-bold text-white">{kpi.label}</div>
+                                            <div className="text-xs text-slate-400 mt-1">{kpi.status === 'error' ? 'Critical failures detected' : kpi.status === 'warning' ? 'Intermittent issues observed' : 'Minor anomalies'}</div>
+                                        </div>
+
+                                        <div className="flex flex-col items-end ml-6">
+                                            <div className="text-xs bg-slate-800/60 rounded-full px-3 py-1 text-slate-200">{Math.abs(kpi.change)} reports</div>
+                                            <div className="text-sm font-bold text-white mt-2">{kpi.value}</div>
+                                        </div>
+                                    </div>
+                                </button>
+                            ))}
+                        </div>
+                    ) : (
+                        <div className="mb-6">
+                            <div className="flex items-center justify-between mb-3">
+                                <h3 className="text-lg font-bold">Reports — {selectedAlert !== null ? kpis[selectedAlert].label : 'Selected'}</h3>
+                                <div className="flex items-center gap-2">
+                                    <button onClick={() => { setActiveTab('dashboard'); setSelectedAlert(null); }} className="text-sm px-3 py-1 rounded-md bg-slate-800/50 hover:bg-slate-800/60 transition">Back</button>
                                 </div>
                             </div>
-                        ))}
-                    </div>
+
+                            <div className="bg-slate-900 rounded-xl p-4 border border-slate-800/30">
+                                <p className="text-sm text-slate-400">Showing recent reports related to this alert. Click any item for full details.</p>
+                                <ul className="mt-3 space-y-2">
+                                    <li className="p-3 bg-slate-800/30 rounded-md">Report — Example failure log (ID: 001)</li>
+                                    <li className="p-3 bg-slate-800/30 rounded-md">Report — Transaction spike analysis (ID: 002)</li>
+                                    <li className="p-3 bg-slate-800/30 rounded-md">Report — Downstream service timeout (ID: 003)</li>
+                                </ul>
+                            </div>
+                        </div>
+                    )}
 
                 </div>
             </div>
