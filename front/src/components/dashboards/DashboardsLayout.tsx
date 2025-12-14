@@ -31,9 +31,9 @@ export const DashboardLayout: React.FC = () => {
         <div className="flex h-screen bg-slate-900 text-white">
             {/* Sidebar */}
             <div className={`bg-slate-950 p-4 flex flex-col transition-all ${sidebarOpen ? 'w-64' : 'w-20'}`}>
-                <div className="mb-6 flex items-center justify-between">
+                <div className="mb-6">
                     <div className="flex items-center gap-2">
-                        <button onClick={() => setSidebarOpen(!sidebarOpen)} className="p-2 hover:bg-slate-800 rounded-lg">
+                        <button onClick={() => setSidebarOpen(!sidebarOpen)} className="p-2 hover:bg-slate-800 rounded-lg" aria-label="Toggle sidebar">
                             <Menu className="w-6 h-6" />
                         </button>
                     </div>
