@@ -203,12 +203,6 @@ const TransactionReport: React.FC<{ initialData?: any }> = ({ initialData }) => 
         const txCount = it.transactions || it.transactions_count || 1;
         const isFailed = (it.status_category || it.status || it.provider_status || '').toString().toLowerCase() === 'failed' || !!it.failure_reason;
 
-        const approvalDistribution = [
-            { status: 'Approved', count: isFailed ? 0 : txCount },
-            { status: 'Not Approved', count: isFailed ? txCount : 0 },
-            { status: 'Indeterminate', count: 0 }
-        ];
-
         // generate 24-hour arrays, putting the event count at the event hour if available
         const hours = Array.from({ length: 24 }).map((_, i) => {
             const hh = i.toString().padStart(2, '0') + ':00';
@@ -222,22 +216,23 @@ const TransactionReport: React.FC<{ initialData?: any }> = ({ initialData }) => 
         })();
 
         // Simulate richer time-series data for graphs when backend provides low volume
-        const totalSimulated = txCount < 50 ? 500 : txCount * 10;
+        const totalSimulated = Math.max(2000, txCount * 100);
 
         // Build a per-hour total distribution (base + gaussian-like peak at eventHour)
         const base = Math.max(1, Math.round(totalSimulated / hours.length / 2));
         const totalWeights = hours.map((_, idx) => {
             const dist = Math.exp(-Math.pow(idx - eventHour, 2) / 10);
-            return base + Math.round(base * dist);
+            return base + Math.round(base * dist * 1.5);
         });
         const sumTotalWeights = totalWeights.reduce((s, v) => s + v, 0) || 1;
-        const totalPerHour = totalWeights.map(w => Math.max(1, Math.round((w / sumTotalWeights) * totalSimulated)));
+        const totalPerHour = totalWeights.map(w => Math.max(5, Math.round((w / sumTotalWeights) * totalSimulated)));
+
         // Failed transactions distributed with a narrower gaussian around the event hour
-        const failedRatio = isFailed ? 0.23 : 0.02;
-        const failedSum = Math.max(1, Math.round(totalSimulated * failedRatio));
-        const failWeights = hours.map((_, idx) => Math.exp(-Math.pow(idx - eventHour, 2) / 8));
+        const failedRatio = isFailed ? 0.20 : 0.03;
+        const failedSum = Math.max(5, Math.round(totalSimulated * failedRatio));
+        const failWeights = hours.map((_, idx) => Math.exp(-Math.pow(idx - eventHour, 2) / 6));
         const sumFailWeights = failWeights.reduce((s, v) => s + v, 0) || 1;
-        const failedTransactions = hours.map((h, idx) => ({ hour: h, count: Math.round((failWeights[idx] / sumFailWeights) * failedSum) }));
+        const failedTransactions = hours.map((h, idx) => ({ hour: h, count: Math.max(0, Math.round((failWeights[idx] / sumFailWeights) * failedSum)) }));
 
         // Success rate per hour derived from totals and failed counts
         const successRate = hours.map((h, idx) => {
@@ -248,11 +243,33 @@ const TransactionReport: React.FC<{ initialData?: any }> = ({ initialData }) => 
         });
 
         // Latency: put the reported latency around the event hour, decaying outward
+        const baseLatency = it.latency_ms ? it.latency_ms : 200;
         const latency = hours.map((h, idx) => {
-            const baseLatency = it.latency_ms ? it.latency_ms : 200;
-            const modifier = 1 + Math.exp(-Math.pow(idx - eventHour, 2) / 12) * 2; // peak multiplier near event
-            return { hour: h, ms: Math.round(baseLatency * modifier) };
+            const modifier = 1 + Math.exp(-Math.pow(idx - eventHour, 2) / 12) * 3; // stronger peak near event
+            return { hour: h, ms: Math.max(50, Math.round(baseLatency * modifier)) };
         });
+
+        // Technical errors per hour (simulate counts proportional to totalPerHour)
+        const technicalErrors = hours.map((h, idx) => {
+            const tot = Math.max(1, totalPerHour[idx]);
+            // distribute across codes with deterministic ratios
+            const e400 = Math.round(tot * 0.01);
+            const e500 = Math.round(tot * 0.005);
+            const e502 = Math.round(tot * 0.0025);
+            const e503 = Math.round(tot * 0.003);
+            const e504 = Math.round(tot * 0.004);
+            return { hour: h, '400': e400, '500': e500, '502': e502, '503': e503, '504': e504 };
+        });
+
+        // Approval distribution aggregated for the pie chart
+        const approvedTotal = totalPerHour.reduce((s, v, i) => s + (v - failedTransactions[i].count), 0);
+        const notApprovedTotal = failedTransactions.reduce((s, v) => s + v.count, 0);
+        const indeterminate = Math.max(0, Math.round(totalSimulated * 0.01));
+        const approvalDistribution = [
+            { status: 'Approved', count: Math.max(0, approvedTotal) },
+            { status: 'Not Approved', count: Math.max(0, notApprovedTotal) },
+            { status: 'Indeterminate', count: indeterminate }
+        ];
 
         const cause = {
             type: it.cause_type || (it.failure_reason ? 'provider' : 'yuno') as any,
@@ -263,8 +280,6 @@ const TransactionReport: React.FC<{ initialData?: any }> = ({ initialData }) => 
                 missingParams: it.missing_params || it.raw_data?.missing_params || []
             }
         };
-
-        const technicalErrors = [] as any[];
 
         return {
             title,
