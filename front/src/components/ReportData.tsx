@@ -183,9 +183,9 @@ const TransactionReport: React.FC = () => {
                 {/* Header */}
                 <div className="flex items-center justify-between mb-4">
                     <div className="flex items-center gap-3 text-sm text-slate-400">
-                        <span className="px-2 py-1 bg-slate-800/40 rounded-md text-slate-200">Reports</span>
+                        <button onClick={() => navigate('/reports')} className="px-2 py-1 bg-slate-800/40 rounded-md text-slate-200 hover:bg-slate-800/60 transition">Reports</button>
                         <span className="text-slate-500">/</span>
-                        <span className="text-slate-300 font-medium">{reportData.cause.details?.clientName || 'Merchant'}</span>
+                        <button onClick={() => navigate(`/reports?merchant=${encodeURIComponent(reportData.cause.details?.clientName || '')}`)} className="text-slate-300 font-medium hover:underline">{reportData.cause.details?.clientName || 'Merchant'}</button>
                         <span className="text-slate-500">/</span>
                         <span className="text-slate-300">{reportData.title}</span>
                     </div>
