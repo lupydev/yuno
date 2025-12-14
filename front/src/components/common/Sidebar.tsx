@@ -26,18 +26,6 @@ const Sidebar: React.FC<SidebarProps> = ({ sidebarOpen, setSidebarOpen }) => {
                 </button>
             </div>
 
-            <div className="flex h-screen bg-slate-950 text-slate-100">
-                {/* Sidebar stays as is */}
-                <Sidebar />
-
-                {/* Main content scrolls */}
-                <div className="flex-1 overflow-auto">
-                    <div className="p-8 max-w-[1800px] mx-auto">
-                        {/* Your dashboard content here */}
-                    </div>
-                </div>
-            </div>
-
 
             {/* Navigation */}
             <nav className="flex-1 p-4 space-y-2">

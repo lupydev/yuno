@@ -1,5 +1,4 @@
 import React, { useState } from 'react';
-import Sidebar from '../common/Sidebar';
 import FilterBar from '../common/FilterBar';
 import { CheckCircle, AlertTriangle, XCircle, TrendingUp, TrendingDown } from 'lucide-react';
 
@@ -9,7 +8,7 @@ const DashboardAdmin: React.FC = () => {
     const [selectedAlert, setSelectedAlert] = useState<number | null>(null);
 
     // Mock global system status
-    const globalStatus = 'yellow';
+    const globalStatus: 'green' | 'yellow' | 'red' = 'yellow';
     const statusConfig = {
         green: { text: 'All Systems Operating Normally', icon: CheckCircle, color: 'text-emerald-400', bg: 'bg-emerald-500/10', border: 'border-emerald-500/30' },
         yellow: { text: 'Minor Issues Detected', icon: AlertTriangle, color: 'text-amber-400', bg: 'bg-amber-500/10', border: 'border-amber-500/30' },
@@ -174,7 +173,7 @@ const DashboardAdmin: React.FC = () => {
                                                     <div className="text-sm font-bold text-white mb-1">{d.total.toLocaleString()} transactions</div>
                                                     <div className="text-xs text-emerald-400">✓ {d.approved.toLocaleString()} approved</div>
                                                     <div className="text-xs text-red-400">✗ {d.declined.toLocaleString()} declined</div>
-                                                    <div className={`text-xs font-semibold mt-1 ${d.rate >= 96 ? 'text-emerald-400' : d.rate >= 94 ? 'text-amber-400' : 'text-red-400'}`}>
+                                                    <div className={`text-xs font-semibold mt-1 ${parseFloat(d.rate) >= 96 ? 'text-emerald-400' : parseFloat(d.rate) >= 94 ? 'text-amber-400' : 'text-red-400'}`}>
                                                         Success Rate: {d.rate}%
                                                     </div>
                                                 </div>
@@ -202,7 +201,7 @@ const DashboardAdmin: React.FC = () => {
                             <div className={`col-span-1 ${statusConfig[globalStatus].bg} ${statusConfig[globalStatus].border} border rounded-xl p-5 flex flex-col items-center justify-center text-center`}>
                                 <StatusIcon className={`w-10 h-10 ${statusConfig[globalStatus].color} mb-2`} />
                                 <h3 className={`text-sm font-bold ${statusConfig[globalStatus].color}`}>
-                                    {globalStatus === 'green' ? 'Healthy' : globalStatus === 'yellow' ? 'Warning' : 'Critical'}
+                                    {globalStatus === 'yellow' ? 'Warning' : globalStatus === 'red' ? 'Critical' : 'Healthy'}
                                 </h3>
                                 <p className="text-xs text-slate-400 mt-1">System Status</p>
                             </div>

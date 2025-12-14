@@ -25,8 +25,8 @@ export const UsersPage: React.FC = () => {
             setUsers(response.data);
             setError("");
         } catch (err) {
-            console.error("Error al cargar usuarios:", err);
-            setError("Error al cargar los usuarios");
+            console.error("Error al cargar developers:", err);
+            setError("Error al cargar los developers");
         } finally {
             setIsLoading(false);
         }
@@ -35,7 +35,7 @@ export const UsersPage: React.FC = () => {
     if (isLoading) {
         return (
             <div className="flex items-center justify-center h-full">
-                <p className="text-lg">Cargando usuarios...</p>
+                <p className="text-lg">Cargando developers...</p>
             </div>
         );
     }
@@ -51,8 +51,8 @@ export const UsersPage: React.FC = () => {
     return (
         <div className="p-8">
             <div className="mb-6">
-                <h1 className="text-3xl font-bold">Gestión de Usuarios</h1>
-                <p className="text-gray-600 mt-2">Administra los usuarios del sistema</p>
+                <h1 className="text-3xl font-bold">Gestión de Developers</h1>
+                <p className="text-gray-600 mt-2">Administra los desarrolladores del sistema</p>
             </div>
 
             <div className="bg-white rounded-lg shadow overflow-hidden">
@@ -80,7 +80,7 @@ export const UsersPage: React.FC = () => {
                         {users.length === 0 ? (
                             <tr>
                                 <td colSpan={5} className="px-6 py-4 text-center text-gray-500">
-                                    No hay usuarios registrados
+                                    No hay developers registrados
                                 </td>
                             </tr>
                         ) : (
