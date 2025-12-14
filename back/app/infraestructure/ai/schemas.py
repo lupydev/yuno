@@ -10,7 +10,7 @@ para minimizar mapeo manual.
 
 from decimal import Decimal
 
-from pydantic import BaseModel, Field
+from pydantic import BaseModel, Field, field_validator
 
 from app.domain.models.enums import ErrorSource, FailureReason, PaymentStatus
 
@@ -76,3 +76,27 @@ class AIPaymentNormalizationOutput(BaseModel):
     latency_ms: int | None = Field(
         default=None, ge=0, description="Payment latency in milliseconds"
     )
+
+    @field_validator("status_category", mode="before")
+    @classmethod
+    def normalize_status_category(cls, v: str | PaymentStatus) -> str:
+        """Convert uppercase enum values from AI to lowercase"""
+        if isinstance(v, str):
+            return v.lower()
+        return v
+
+    @field_validator("failure_reason", mode="before")
+    @classmethod
+    def normalize_failure_reason(cls, v: str | FailureReason | None) -> str | None:
+        """Convert uppercase enum values from AI to lowercase"""
+        if isinstance(v, str):
+            return v.lower()
+        return v
+
+    @field_validator("error_source", mode="before")
+    @classmethod
+    def normalize_error_source(cls, v: str | ErrorSource | None) -> str | None:
+        """Convert uppercase enum values from AI to lowercase"""
+        if isinstance(v, str):
+            return v.lower()
+        return v

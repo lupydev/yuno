@@ -64,7 +64,7 @@ class PaymentRepository(IPaymentRepository):
                 "merchant": event.merchant_name,
                 "provider": event.provider,
                 "status": event.status_category.value,
-                "amount": float(event.amount),
+                "amount": float(event.amount) if event.amount is not None else None,
                 "currency": event.currency,
             },
         )

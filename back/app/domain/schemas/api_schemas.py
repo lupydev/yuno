@@ -47,8 +47,8 @@ class EventDetailResponse(BaseModel):
     status_category: PaymentStatus
     failure_reason: FailureReason | None
     # Multi-currency fields
-    amount: Decimal
-    currency: str
+    amount: Decimal | None
+    currency: str | None
     amount_usd_equivalent: Decimal | None
     # Provider details
     provider_transaction_id: str | None
