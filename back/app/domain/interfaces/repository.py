@@ -17,7 +17,7 @@ class IPaymentRepository(Protocol):
     Best Practice: Usar Protocol para desacoplamiento entre domain y infrastructure
     """
 
-    async def save(self, event: NormalizedPaymentEvent) -> NormalizedPaymentEvent:
+    def save(self, event: NormalizedPaymentEvent) -> NormalizedPaymentEvent:
         """
         Guarda un evento de pago normalizado
 
@@ -32,7 +32,7 @@ class IPaymentRepository(Protocol):
         """
         ...
 
-    async def get_by_id(self, event_id: UUID) -> NormalizedPaymentEvent | None:
+    def get_by_id(self, event_id: UUID) -> NormalizedPaymentEvent | None:
         """
         Obtiene un evento por su ID
 
@@ -44,7 +44,7 @@ class IPaymentRepository(Protocol):
         """
         ...
 
-    async def get_by_provider_transaction_id(
+    def get_by_provider_transaction_id(
         self, provider_transaction_id: str
     ) -> NormalizedPaymentEvent | None:
         """
@@ -61,7 +61,7 @@ class IPaymentRepository(Protocol):
         """
         ...
 
-    async def get_unprocessed(self, limit: int = 100) -> list[NormalizedPaymentEvent]:
+    def get_unprocessed(self, limit: int = 100) -> list[NormalizedPaymentEvent]:
         """
         Obtiene eventos que no pudieron ser procesados (UNPROCESSED)
 
@@ -76,7 +76,7 @@ class IPaymentRepository(Protocol):
         """
         ...
 
-    async def get_by_filters(
+    def get_by_filters(
         self,
         provider: str | None = None,
         status: PaymentStatus | None = None,
@@ -101,7 +101,7 @@ class IPaymentRepository(Protocol):
         """
         ...
 
-    async def count_by_status(self, status: PaymentStatus) -> int:
+    def count_by_status(self, status: PaymentStatus) -> int:
         """
         Cuenta eventos por estado
 
