@@ -27,6 +27,8 @@ class NormalizedPaymentEvent(SQLModel, table=True):
     Las validaciones de negocio están en los schemas (normalization_schemas.py).
     """
 
+    __tablename__ = "normalized_payment_events"  # type: ignore[assignment]
+
     # Índices compuestos para queries comunes (Best Practice)
     __table_args__ = (
         sqlalchemy.Index("idx_created_at", "created_at"),
