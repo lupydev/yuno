@@ -1,27 +1,17 @@
 import { Routes, Route, Navigate } from "react-router-dom";
-import { ProtectedRoute } from "./components/ProtectedRoute.tsx";
 import { Login } from "./pages/LoginPage.tsx";
-import { DashboardPage } from "./pages/DashboarPage.tsx";
+import DashboardAdmin from "./components/dashboards/DashboardAdmin.tsx";
 import { ReportsPage } from "./pages/ReportsPage.tsx";
-import { DashboardLayout } from "./components/dashboards/DashboardsLayout.tsx";
 
 export const AppRoutes = () => {
     return (
         <Routes>
-            <Route path="*" element={<Navigate to="/login" />} />
-            <Route path="/" element={<Navigate to="/login" />} />
+            <Route path="*" element={<Navigate to="/dashboard" />} />
+            <Route path="/" element={<Navigate to="/dashboard" />} />
             <Route path="/login" element={<Login />} />
+            <Route path="/dashboard" element={<DashboardAdmin />} />
+            <Route path="/reports" element={<ReportsPage />} />
 
-            <Route element={<DashboardLayout />}>
-                <Route
-                    element={
-                        <ProtectedRoute allowedRoles={["ADMIN", "CLIENT"]} />
-                    }
-                >
-                    <Route path="/dashboard" element={<DashboardPage />} />
-                    <Route path="/reports" element={<ReportsPage />} />
-                </Route>
-            </Route>
 
         </Routes>
     );
