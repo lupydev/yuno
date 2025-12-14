@@ -1,7 +1,7 @@
 /* Light mode overrides when [data-theme="light"] is set on documentElement */
 
 [data-theme="light"] body {
-  background-color: #f8fafc !important; /* slate-50 */
+  background-color: #f3f4f6 !important; /* slightly greyish */
   color: #0f172a !important; /* slate-900 */
 }
 
@@ -19,24 +19,67 @@
 /* Borders */
 [data-theme="light"] .border-slate-800 { border-color: #e2e8f0 !important; }
 
-/* Buttons and accents */
-[data-theme="light"] .bg-indigo-600 { background-color: #4f46e5 !important; }
+/* Buttons and accents - revert general font override to previous color */
+[data-theme="light"] .bg-indigo-600 { background-color: #7c3aed !important; }
 [data-theme="light"] .text-slate-400 { color: #475569 !important; }
+
+/* Table header accent (subtle purple) */
+[data-theme="light"] .bg-slate-800\/50 { background-color: rgba(124,58,237,0.06) !important; }
+[data-theme="light"] thead th { color: #5b21a8 !important; }
 
 /* Cards */
 [data-theme="light"] .shadow-sm { box-shadow: 0 1px 2px rgba(2,6,23,0.04) !important; }
 
-/* Reduce contrast on hover in light mode */
-[data-theme="light"] .hover\:bg-slate-800:hover { background-color: #eef2ff !important; }
+/* Reduce contrast on hover in light mode (subtle purple) */
+[data-theme="light"] .hover\:bg-slate-800:hover { background-color: #f5e9ff !important; }
 
-/* Ensure links/buttons visible */
-[data-theme="light"] .hover\:bg-slate-800\/40:hover { background-color: rgba(236, 244, 255, 0.6) !important; }
+/* Ensure links/buttons visible (light purple overlay) */
+[data-theme="light"] .hover\:bg-slate-800\/40:hover { background-color: rgba(124,58,237,0.06) !important; }
 
-/* Minimal fixes: adjust badge backgrounds */
-[data-theme="light"] .bg-emerald-900\/20 { background-color: rgba(16, 185, 129, 0.08) !important; }
+/* Minimal fixes: adjust badge backgrounds to purple tints */
+[data-theme="light"] .bg-emerald-900\/20 { background-color: rgba(124,58,237,0.08) !important; }
 
 /* Profile avatar border */
 [data-theme="light"] .rounded-full { border: none !important; }
 
 /* Make sure svg strokes are visible */
 [data-theme="light"] svg { color: inherit; }
+
+/* Buttons text color for purple buttons: use white for contrast */
+.bg-indigo-600, .bg-indigo-700, .bg-indigo-500 {
+  color: #ffffff !important; /* force white */
+}
+.bg-indigo-600:hover, .bg-indigo-700:hover, .bg-indigo-500:hover {
+  color: #ffffff !important;
+}
+
+/* Chart-specific: keep tooltip and chart labels white in light mode */
+[data-theme="light"] .chart-root .text-white,
+[data-theme="light"] .chart-root .text-slate-200,
+[data-theme="light"] .chart-root .text-slate-300 {
+  color: #ffffff !important;
+}
+
+/* NOTE: Do not override svg path/line colors here to preserve the chart series colors in light mode */
+
+/* Strong override: ensure purple buttons and any children always use white text in light mode */
+[data-theme="light"] button.bg-indigo-600,
+[data-theme="light"] button.bg-indigo-700,
+[data-theme="light"] button.bg-indigo-500,
+[data-theme="light"] a.bg-indigo-600,
+[data-theme="light"] a.bg-indigo-700,
+[data-theme="light"] a.bg-indigo-500,
+[data-theme="light"] .bg-indigo-600,
+[data-theme="light"] .bg-indigo-700,
+[data-theme="light"] .bg-indigo-500 {
+  color: #ffffff !important;
+  fill: #ffffff !important;
+}
+
+[data-theme="light"] .bg-indigo-600 *,
+[data-theme="light"] .bg-indigo-700 *,
+[data-theme="light"] .bg-indigo-500 * {
+  color: #ffffff !important;
+  fill: #ffffff !important;
+}
+

@@ -240,7 +240,7 @@ const DashboardAdmin: React.FC = () => {
                     <FilterBar onChange={setFilters} merchants={merchantsList} providers={providersList} />
 
                     {/* Chart */}
-                    <div className="bg-gradient-to-b from-slate-900/60 to-slate-900/40 rounded-xl p-6 mb-6 shadow-sm border border-slate-800/20">
+                    <div className="chart-root bg-gradient-to-b from-slate-900/60 to-slate-900/40 rounded-xl p-6 mb-6 shadow-sm border border-slate-800/20">
                         {/* Chart header & legend */}
                         <div className="flex items-center justify-between mb-6">
                             <div>
