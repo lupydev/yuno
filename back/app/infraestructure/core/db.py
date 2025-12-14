@@ -11,6 +11,11 @@ engine = create_engine(
     # !imprime logs de querys
     echo=settings.ENVIRONMENT == "development",
     future=True,
+    # Pool configuration para evitar timeout con workers
+    pool_size=10,  # Aumentado de 5 (default) a 10
+    max_overflow=20,  # Aumentado de 10 (default) a 20
+    pool_timeout=30,  # Timeout en segundos
+    pool_pre_ping=True,  # Verifica conexiones antes de usar
 )
 
 

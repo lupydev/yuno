@@ -99,7 +99,7 @@ class DataLakeWorker:
             # 2. Procesar cada transacción
             for transaction in transactions:
                 try:
-                    # Crear orchestrator usando la factory (ya tiene session inyectada)
+                    # Crear orchestrator con session que se cierra automáticamente
                     orchestrator = self.orchestrator_factory()
 
                     # Extraer información del payload
@@ -123,6 +123,9 @@ class DataLakeWorker:
                         raw_event=raw_event,
                         provider_hint=raw_event.get("audit", {}).get("gw"),  # Hint: gateway name
                     )
+
+                    # CRITICAL: Cerrar la sesión explícitamente para liberar conexión
+                    orchestrator.repository.session.close()
 
                     # Guardar ID para marcar como procesado
                     processed_ids.append(transaction["id"])
@@ -149,6 +152,12 @@ class DataLakeWorker:
                         },
                         exc_info=True,
                     )
+                    # Asegurar cierre de sesión incluso en error
+                    try:
+                        if "orchestrator" in locals():
+                            orchestrator.repository.session.close()
+                    except:
+                        pass
                     # Continuar con la siguiente transacción
 
             # 3. Marcar como procesadas en Data Lake
@@ -292,5 +301,5 @@ def create_datalake_worker() -> DataLakeWorker:
         datalake_client=datalake_client,
         orchestrator_factory=create_orchestrator,
         # TODO: cambiar a minuto para la demo
-        interval_seconds=60 * 60 * 24,  # Cada minuto
+        interval_seconds=60,  # Cada minuto
     )
