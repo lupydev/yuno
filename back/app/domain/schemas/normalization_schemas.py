@@ -5,7 +5,7 @@ from typing import Any
 
 from pydantic import BaseModel, Field, field_validator
 
-from app.domain.models.enums import FailureReason, PaymentStatus
+from app.domain.models.enums import ErrorSource, FailureReason, PaymentStatus
 
 
 class NormalizedPaymentSchema(BaseModel):
@@ -21,15 +21,30 @@ class NormalizedPaymentSchema(BaseModel):
     merchant_name: str = Field(..., min_length=1, max_length=255)
     provider: str = Field(..., min_length=1, max_length=100)
     country: str = Field(..., min_length=2, max_length=2)
+    transactional_id: str | None = Field(
+        default=None,
+        max_length=255,
+        description="Merchant-Provider connection ID (for insights and alerts)",
+    )
 
     # Status
     status_category: PaymentStatus
     failure_reason: FailureReason | None = None
+    error_source: ErrorSource | None = Field(
+        default=None,
+        description="Who caused the error: provider, merchant, customer, network, system",
+    )
+    http_status_code: int | None = Field(
+        default=None, ge=100, le=599, description="HTTP status code for coherence validation"
+    )
 
     # Financial (dual storage: original + USD equivalent)
-    amount: Decimal = Field(..., gt=0, description="Transaction amount in original currency")
-    currency: str = Field(
-        ..., min_length=3, max_length=3, description="ISO 4217 currency code (USD, EUR, MXN, etc.)"
+    # OPTIONAL: Error/failure events may not contain financial information
+    amount: Decimal | None = Field(
+        default=None, gt=0, description="Transaction amount in original currency (optional)"
+    )
+    currency: str | None = Field(
+        default=None, min_length=3, max_length=3, description="ISO 4217 currency code (optional)"
     )
     amount_usd_equivalent: Decimal | None = Field(
         default=None, gt=0, description="Amount in USD for analytics (calculated at normalization)"

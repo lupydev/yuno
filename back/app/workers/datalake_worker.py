@@ -291,5 +291,6 @@ def create_datalake_worker() -> DataLakeWorker:
     return DataLakeWorker(
         datalake_client=datalake_client,
         orchestrator_factory=create_orchestrator,
-        interval_seconds=60,  # Cada minuto
+        # TODO: cambiar a minuto para la demo
+        interval_seconds=60 * 60 * 24,  # Cada minuto
     )

@@ -12,7 +12,7 @@ from decimal import Decimal
 
 from pydantic import BaseModel, Field
 
-from app.domain.models.enums import FailureReason, PaymentStatus
+from app.domain.models.enums import ErrorSource, FailureReason, PaymentStatus
 
 
 class AIPaymentNormalizationOutput(BaseModel):
@@ -52,11 +52,24 @@ class AIPaymentNormalizationOutput(BaseModel):
         default=None,
         description="Specific failure reason (only if status is FAILED)",
     )
+    error_source: ErrorSource | None = Field(
+        default=None,
+        description="Who/what caused the error: provider, merchant, customer, network, system, unknown",
+    )
+    http_status_code: int | None = Field(
+        default=None, ge=100, le=599, description="HTTP status code from provider response"
+    )
 
     # Financial - AI retorna amount + currency, luego convertimos a USD
-    amount: Decimal = Field(..., gt=0, description="Transaction amount")
-    currency: str = Field(
-        ..., min_length=3, max_length=3, description="ISO 4217 currency code (USD, EUR, etc.)"
+    # OPTIONAL: Many error events don't have amount/currency
+    amount: Decimal | None = Field(
+        default=None, gt=0, description="Transaction amount (null if not present in raw data)"
+    )
+    currency: str | None = Field(
+        default=None,
+        min_length=3,
+        max_length=3,
+        description="ISO 4217 currency code (null if not present)",
     )
 
     # Latency (opcional)

@@ -39,55 +39,64 @@ PAYMENT_NORMALIZATION_SYSTEM_PROMPT = """You are a payment event normalization A
    - `refunded`: Payment was refunded
    - `unprocessed`: Cannot be normalized
 
-6. **FAILURE REASON MAPPING**:
-   If status is `failed`, map to ONE of these reasons:
+6. **FAILURE REASON MAPPING & ERROR SOURCE**:
+   If status is `failed`, map to ONE of these reasons AND identify the error source:
 
-   **Card Issues**:
-   - `INSUFFICIENT_FUNDS`: Not enough balance
-   - `CARD_DECLINED`: Generic card decline
-   - `CARD_EXPIRED`: Card past expiration date
-   - `INVALID_CARD_NUMBER`: Card number invalid
-   - `INVALID_CVV`: CVV/CVC incorrect
-   - `CARD_LOST_STOLEN`: Card reported lost/stolen
-   - `CARD_BLOCKED`: Card blocked by issuer
+   **CUSTOMER Errors** (error_source: "customer"):
+   - `insufficient_funds`: Not enough balance
+   - `expired_card`: Card past expiration date
+   - `invalid_card`: Card number invalid
+   - `bank_decline`: Customer's bank declined
 
-   **Authentication Issues**:
-   - `AUTHENTICATION_FAILED`: 3DS or other auth failed
-   - `THREE_DS_FAILED`: Specific 3DS failure
+   **PROVIDER Errors** (error_source: "provider"):
+   - `timeout`: Transaction timed out at provider
+   - `provider_error`: Payment gateway/provider internal error
+   - `network_error`: Provider network/connectivity issue
 
-   **Risk & Fraud**:
-   - `FRAUD_SUSPECTED`: Flagged as suspicious
-   - `RISK_THRESHOLD_EXCEEDED`: Risk score too high
+   **MERCHANT Errors** (error_source: "merchant"):
+   - `invalid_merchant`: Merchant account issue/not active
+   - `configuration_error`: PSP configuration issue
+   - `merchant_not_active`: Merchant suspended
 
-   **Processing Issues**:
-   - `PROCESSING_ERROR`: Generic processing error
-   - `TIMEOUT`: Transaction timed out
-   - `NETWORK_ERROR`: Network/connectivity issue
-   - `GATEWAY_ERROR`: Payment gateway error
-   - `ACQUIRER_ERROR`: Acquiring bank error
+   **SECURITY/FRAUD** (error_source: "provider" or "system"):
+   - `fraud_suspected`: Flagged as suspicious
+   - `security_violation`: Security rules violated
+   - `blocked_card`: Card blocked
 
-   **Business Rules**:
-   - `AMOUNT_LIMIT_EXCEEDED`: Exceeds transaction limit
-   - `COUNTRY_NOT_SUPPORTED`: Country not allowed
-   - `CURRENCY_NOT_SUPPORTED`: Currency not supported
-   - `DUPLICATE_TRANSACTION`: Duplicate detected
+   **TECHNICAL/NETWORK** (error_source: "network"):
+   - `network_error`: Network/connectivity issue
+   - `system_error`: System internal error
 
-   **Other**:
-   - `INVALID_MERCHANT`: Merchant account issue
-   - `CONFIGURATION_ERROR`: PSP config issue
-   - `UNKNOWN_ERROR`: Cannot determine reason
+   **BUSINESS RULES** (error_source: varies):
+   - `amount_exceeded`: Exceeds limit (check who set the limit)
+   - `invalid_currency`: Currency not supported
+   - `duplicate_transaction`: Duplicate detected
 
-   Use `null` if status is NOT `failed`.
+   **UNKNOWN** (error_source: "unknown"):
+   - `unknown`: Cannot determine reason
 
-7. **COUNTRY CODE**: Extract and convert to ISO 3166-1 alpha-2 (2-letter uppercase, e.g., "US", "GB", "MX")
+   Use `null` for both if status is NOT `failed`.
 
-8. **TIMESTAMPS**:
+7. **HTTP STATUS CODE & COHERENCE**:
+   - Extract HTTP status code if present (e.g., 200, 400, 500)
+   - Validate coherence with status:
+     * 2xx should be `approved` or `pending`
+     * 4xx usually means `failed` (client/merchant error)
+     * 5xx usually means `failed` (provider/system error)
+   - Map error_source based on HTTP code:
+     * 400-499: Usually "customer" or "merchant"
+     * 500-599: Usually "provider" or "system"
+     * timeout/network: Usually "network"
+
+8. **COUNTRY CODE**: Extract and convert to ISO 3166-1 alpha-2 (2-letter uppercase, e.g., "US", "GB", "MX")
+
+9. **TIMESTAMPS**:
    - Use ISO 8601 format (YYYY-MM-DDTHH:MM:SSZ)
    - If timezone is missing, assume UTC
    - created_at: When payment was initiated
    - updated_at: Last status change
 
-9. **PROVIDER NORMALIZATION**:
+10. **PROVIDER NORMALIZATION**:
    Standardize provider names (lowercase, no spaces):
    - "stripe" for Stripe, Stripe Inc, STRIPE
    - "adyen" for Adyen, ADYEN
@@ -107,6 +116,8 @@ Return ONLY a valid JSON object matching this structure:
   "country": "US",
   "status_category": "approved",
   "failure_reason": null,
+  "error_source": null,
+  "http_status_code": 200,
   "amount": 99.99,
   "currency": "USD",
   "latency_ms": null
@@ -139,13 +150,84 @@ Output:
   "country": null,
   "status_category": "approved",
   "failure_reason": null,
+  "error_source": null,
+  "http_status_code": 200,
   "amount": 50.00,
   "currency": "USD",
   "latency_ms": null
 }
 ```
 
-### Example 2: Failed Payment
+### Example 2: Customer Error (Insufficient Funds)
+Input:
+```json
+{
+  "transaction_id": "TXN-456",
+  "provider": "kushki",
+  "status": "DECLINED",
+  "http_code": 402,
+  "error_code": "insufficient_funds",
+  "details": {
+    "reason": "00_INSUFFICIENT_FUNDS",
+    "disposition": "FAILED"
+  },
+  "latency_ms": 234
+}
+```
+
+Output:
+```json
+{
+  "merchant_name": null,
+  "provider": "kushki",
+  "provider_transaction_id": "TXN-456",
+  "provider_status": "DECLINED",
+  "country": null,
+  "status_category": "failed",
+  "failure_reason": "insufficient_funds",
+  "error_source": "customer",
+  "http_status_code": 402,
+  "amount": null,
+  "currency": null,
+  "latency_ms": 234
+}
+```
+
+### Example 3: Provider Timeout Error
+Input:
+```json
+{
+  "id": "PAY-789",
+  "gateway": "MercadoPago",
+  "status": "ERROR",
+  "http_status": 504,
+  "error": {
+    "code": "gateway_timeout",
+    "message": "Payment gateway timeout"
+  },
+  "latency": 30000
+}
+```
+
+Output:
+```json
+{
+  "merchant_name": null,
+  "provider": "mercadopago",
+  "provider_transaction_id": "PAY-789",
+  "provider_status": "ERROR",
+  "country": null,
+  "status_category": "failed",
+  "failure_reason": "timeout",
+  "error_source": "provider",
+  "http_status_code": 504,
+  "amount": null,
+  "currency": null,
+  "latency_ms": 30000
+}
+```
+
+### Example 4: Merchant Configuration Error
 Input:
 ```json
 {

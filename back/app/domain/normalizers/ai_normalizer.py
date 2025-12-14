@@ -225,8 +225,10 @@ class AIBasedNormalizer(INormalizer):
             end_time = datetime.now(UTC)
             normalization_latency = int((end_time - start_time).total_seconds() * 1000)
 
-            # Calcular USD equivalent para analytics
-            amount_usd_equivalent = convert_to_usd(ai_output.amount, ai_output.currency)
+            # Calcular USD equivalent para analytics (solo si hay amount y currency)
+            amount_usd_equivalent = None
+            if ai_output.amount is not None and ai_output.currency is not None:
+                amount_usd_equivalent = convert_to_usd(ai_output.amount, ai_output.currency)
 
             # Mapear AI output a NormalizedPaymentEvent
             normalized_event = NormalizedPaymentEvent(
@@ -234,12 +236,15 @@ class AIBasedNormalizer(INormalizer):
                 merchant_name=ai_output.merchant_name or "unknown_merchant",
                 provider=ai_output.provider.lower(),
                 country=ai_output.country or "XX",  # Default country code
+                transactional_id=raw_event.get("transactional_id"),  # From Data Lake
                 # Status
                 status_category=ai_output.status_category,
                 failure_reason=ai_output.failure_reason,
-                # Financial (preserve original currency)
+                error_source=ai_output.error_source,  # For intelligent alerts
+                http_status_code=ai_output.http_status_code,  # For coherence validation
+                # Financial (preserve original currency) - may be None for error events
                 amount=ai_output.amount,
-                currency=ai_output.currency.upper(),
+                currency=ai_output.currency.upper() if ai_output.currency else None,
                 amount_usd_equivalent=amount_usd_equivalent,
                 # Provider details
                 provider_transaction_id=ai_output.provider_transaction_id,

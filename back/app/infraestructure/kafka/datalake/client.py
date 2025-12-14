@@ -3,10 +3,12 @@
 import logging
 from typing import Any
 
-from sqlalchemy import create_engine, text
+from sqlalchemy import create_engine
 from sqlalchemy.engine import Engine
 from sqlalchemy.exc import SQLAlchemyError
-from sqlalchemy.orm import Session
+from sqlmodel import Session, select
+
+from app.domain.models.raw_payment import RawPaymentIngestion
 
 logger = logging.getLogger(__name__)
 
@@ -38,6 +40,10 @@ class DataLakeClient:
             raise ValueError("connection_url no puede estar vacío")
 
         try:
+            # Usar postgresql+psycopg (mismo driver que el resto de la app)
+            if connection_url.startswith("postgresql://"):
+                connection_url = connection_url.replace("postgresql://", "postgresql+psycopg://")
+
             self.engine: Engine = create_engine(
                 connection_url, pool_pre_ping=True, pool_size=5, max_overflow=10
             )
@@ -48,7 +54,7 @@ class DataLakeClient:
 
     def get_unprocessed_transactions(self, limit: int = 100) -> list[dict[str, Any]]:
         """
-        Obtiene transacciones no procesadas del data lake
+        Obtiene transacciones no procesadas del data lake usando SQLModel
 
         Args:
             limit: Número máximo de transacciones a obtener
@@ -56,35 +62,31 @@ class DataLakeClient:
         Returns:
             Lista de transacciones como diccionarios con campos:
             - id (str): UUID del registro
-            - data (dict): Datos heterogéneos de la transacción
-            - merchant (dict): Información del merchant {id, name, country}
-            - transactional_id (str): UUID de la transacción
+            - payload (dict): Payload completo del JSONB que contiene:
+                - data (dict): Datos heterogéneos de la transacción (ESTO es lo que la IA debe normalizar)
+                - merchant (dict): Información del merchant {id, name, country}
+                - transactional_id (str): UUID de la transacción
             - created_at (datetime): Timestamp de creación
 
         Raises:
             DataLakeQueryError: Si hay un error al ejecutar la query
         """
-        query = text(
-            """
-            SELECT id, data, merchant, transactional_id, created_at
-            FROM raw_transactions
-            WHERE processed = false
-            ORDER BY created_at ASC
-            LIMIT :limit
-        """
-        )
-
         try:
             with Session(self.engine) as session:
-                result = session.execute(query, {"limit": limit})
-                rows = result.fetchall()
+                # Query usando SQLModel
+                statement = (
+                    select(RawPaymentIngestion)
+                    .where(RawPaymentIngestion.is_processed == False)
+                    .order_by(RawPaymentIngestion.created_at)
+                    .limit(limit)
+                )
+
+                rows = session.exec(statement).all()
 
                 transactions = [
                     {
                         "id": str(row.id),
-                        "data": row.data,
-                        "merchant": row.merchant,
-                        "transactional_id": str(row.transactional_id),
+                        "payload": row.payload,  # JSONB completo
                         "created_at": row.created_at,
                     }
                     for row in rows
@@ -99,7 +101,7 @@ class DataLakeClient:
 
     def mark_as_processed(self, transaction_ids: list[str]) -> int:
         """
-        Marca transacciones como procesadas en el data lake
+        Marca transacciones como procesadas en el data lake usando SQLModel
 
         Args:
             transaction_ids: Lista de UUIDs de transacciones a marcar
@@ -114,20 +116,21 @@ class DataLakeClient:
             logger.warning("⚠️  Lista de transaction_ids vacía, no se marcó nada")
             return 0
 
-        query = text(
-            """
-            UPDATE raw_transactions
-            SET processed = true, processed_at = NOW()
-            WHERE id = ANY(:ids)
-        """
-        )
-
         try:
             with Session(self.engine) as session:
-                result = session.execute(query, {"ids": transaction_ids})
+                # Obtener las transacciones a actualizar
+                statement = select(RawPaymentIngestion).where(
+                    RawPaymentIngestion.id.in_(transaction_ids)
+                )
+                transactions = session.exec(statement).all()
+
+                # Marcar como procesadas
+                for transaction in transactions:
+                    transaction.is_processed = True
+
                 session.commit()
 
-                updated_count = result.rowcount
+                updated_count = len(transactions)
                 logger.info(f"✅ Marcadas {updated_count} transacciones como procesadas")
                 return updated_count
 
@@ -139,7 +142,7 @@ class DataLakeClient:
 
     def get_transaction_count(self, processed: bool | None = None) -> int:
         """
-        Obtiene el conteo de transacciones en el data lake
+        Obtiene el conteo de transacciones en el data lake usando SQLModel
 
         Args:
             processed: Si es True, cuenta procesadas. Si es False, cuenta no procesadas.
@@ -151,17 +154,16 @@ class DataLakeClient:
         Raises:
             DataLakeQueryError: Si hay un error al ejecutar la query
         """
-        if processed is None:
-            query = text("SELECT COUNT(*) FROM raw_transactions")
-            params = {}
-        else:
-            query = text("SELECT COUNT(*) FROM raw_transactions WHERE processed = :processed")
-            params = {"processed": processed}
-
         try:
             with Session(self.engine) as session:
-                result = session.execute(query, params)
-                count = result.scalar()
+                from sqlalchemy import func
+
+                statement = select(func.count()).select_from(RawPaymentIngestion)
+
+                if processed is not None:
+                    statement = statement.where(RawPaymentIngestion.is_processed == processed)
+
+                count = session.exec(statement).one()
                 return count or 0
 
         except SQLAlchemyError as e:
@@ -170,14 +172,17 @@ class DataLakeClient:
 
     def health_check(self) -> bool:
         """
-        Verifica la conexión con el data lake
+        Verifica la conexión con el data lake usando SQLModel
 
         Returns:
             True si la conexión es exitosa, False en caso contrario
         """
         try:
             with Session(self.engine) as session:
-                session.execute(text("SELECT 1"))
+                from sqlalchemy import func
+
+                # Simple query para verificar conexión
+                session.exec(select(func.count()).select_from(RawPaymentIngestion)).one()
                 logger.info("✅ Health check exitoso")
                 return True
         except SQLAlchemyError as e:

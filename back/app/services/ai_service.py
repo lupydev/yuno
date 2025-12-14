@@ -25,8 +25,7 @@ class LocationCategoryExtraction(BaseModel):
     city: str | None = Field(None, description="City name or null")
     country: str | None = Field(None, description="Country name or null")
     state: str | None = Field(None, description="State/province or null")
-    category: str | None = Field(
-        None, description="Event category/type or null")
+    category: str | None = Field(None, description="Event category/type or null")
 
 
 class EventScrapingState(TypedDict):
@@ -117,8 +116,7 @@ class AIService:
                 return result
             return None
         except Exception as e:
-            logger.error(
-                f"Failed to extract location/category with LangChain: {e}")
+            logger.error(f"Failed to extract location/category with LangChain: {e}")
             return None
 
     async def scrape_events_with_langgraph(
@@ -186,12 +184,10 @@ class AIService:
 
             try:
                 result = await chain.ainvoke(
-                    {"search_query": state["search_query"],
-                        "limit": state["limit"]}
+                    {"search_query": state["search_query"], "limit": state["limit"]}
                 )
                 state["raw_events"] = result.get("events", [])
-                logger.info(
-                    f"Found {len(state['raw_events'])} raw events from web")
+                logger.info(f"Found {len(state['raw_events'])} raw events from web")
             except Exception as e:
                 logger.error(f"Error searching events: {e}")
                 state["error"] = str(e)
@@ -310,8 +306,7 @@ class AIService:
             search_parts.append(f"Category: {category}")
         if city:
             search_parts.append(f"City: {city}")
-        search_context = ", ".join(
-            search_parts) if search_parts else "General search"
+        search_context = ", ".join(search_parts) if search_parts else "General search"
 
         prompt = ChatPromptTemplate.from_messages(
             [("system", system_template), ("user", user_template)]

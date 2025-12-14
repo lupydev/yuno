@@ -6,8 +6,6 @@ Tests para validar las funciones de conversión de moneda
 
 from decimal import Decimal
 
-import pytest
-
 from app.domain.utils.currency_converter import (
     CURRENCY_TO_USD_RATES,
     convert_to_usd,

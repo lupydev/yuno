@@ -466,8 +466,12 @@ class RuleBasedNormalizer(INormalizer):
             end_time = datetime.now(UTC)
             latency_ms = int((end_time - start_time).total_seconds() * 1000)
 
-            # Calcular USD equivalent para analytics
-            amount_usd_equivalent = convert_to_usd(fields["amount"], fields["currency"])
+            # Calcular USD equivalent para analytics (solo si hay amount y currency)
+            amount_usd_equivalent = None
+            amount = fields.get("amount")
+            currency = fields.get("currency")
+            if amount is not None and currency is not None:
+                amount_usd_equivalent = convert_to_usd(amount, currency)
 
             # Crear evento normalizado con campos correctos del modelo
             normalized_event = NormalizedPaymentEvent(
@@ -475,12 +479,15 @@ class RuleBasedNormalizer(INormalizer):
                 merchant_name=fields.get("merchant_id") or "unknown_merchant",
                 provider=mapper.provider_name,
                 country=fields.get("country_code") or "XX",
+                transactional_id=raw_event.get("transactional_id"),  # From Data Lake
                 # Status
                 status_category=status_category,
                 failure_reason=failure_reason,
-                # Financial - preservar original + USD equivalent
-                amount=fields["amount"],
-                currency=fields["currency"],
+                error_source=None,  # Rule normalizer doesn't infer error source yet
+                http_status_code=None,  # Not extracted by rule normalizer
+                # Financial - preservar original + USD equivalent (may be None)
+                amount=amount,
+                currency=currency,
                 amount_usd_equivalent=amount_usd_equivalent,
                 # Provider details
                 provider_transaction_id=fields["provider_transaction_id"],
