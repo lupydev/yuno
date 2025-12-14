@@ -24,7 +24,7 @@ def upgrade() -> None:
     # Create roles enum if not exists
     op.execute("""
         DO $$ BEGIN
-            CREATE TYPE roles AS ENUM ('ADMIN', 'DEVELOPER', 'CLIENT');
+            CREATE TYPE roles AS ENUM ('ADMIN', 'DEVELOPER');
         EXCEPTION
             WHEN duplicate_object THEN null;
         END $$;
