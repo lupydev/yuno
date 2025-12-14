@@ -1,7 +1,7 @@
 from typing import Annotated
 
-from app.core.config import settings
-from app.core.db import SessionDep
+from app.infraestructure.core.config import settings
+from app.infraestructure.core.db import SessionDep
 from app.models import User
 from app.schemas import TokenPayload
 from fastapi import Depends, HTTPException, status
@@ -21,7 +21,8 @@ async def get_current_user(
     from app.services.user import get_user_by_id
 
     try:
-        payload = jwt.decode(token, settings.SECRET_KEY, algorithms=[settings.ALGORITHM])
+        payload = jwt.decode(token, settings.SECRET_KEY,
+                             algorithms=[settings.ALGORITHM])
         token_data = TokenPayload(**payload)
     except (JWTError, ValidationError):
         raise HTTPException(
@@ -35,7 +36,8 @@ async def get_current_user(
             detail="No se encontró este usuario en la base de datos.",
         )
     if not user.is_active:
-        raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail="Usuario inactivo.")
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST, detail="Usuario inactivo.")
     return user
 
 
