@@ -217,9 +217,9 @@ const TransactionReport: React.FC = () => {
                         </div>
                         <div className="flex items-center gap-2">
                             {reportData.humanChecked ? (
-                                <div className="flex items-center gap-2 px-3 py-2 bg-emerald-900/20 rounded-md border border-emerald-800/30">
-                                    <CheckCircle className="w-5 h-5 text-emerald-400" />
-                                    <span className="text-sm font-medium text-emerald-300">Human Verified</span>
+                                <div className="flex items-center gap-2 px-3 py-2 bg-emerald-700/20 rounded-md border border-emerald-600/40">
+                                    <CheckCircle className="w-5 h-5 text-emerald-500" />
+                                    <span className="text-sm font-medium text-emerald-400">Human Verified</span>
                                 </div>
                             ) : (
                                 <div className="flex items-center gap-2 px-3 py-2 bg-amber-900/20 rounded-md border border-amber-800/30">
@@ -237,7 +237,7 @@ const TransactionReport: React.FC = () => {
                                 <div className="flex items-start gap-4">
                                     <AlertCircle className="w-6 h-6 text-indigo-400 mt-1" />
                                     <div>
-                                        <h3 className="text-lg font-semibold text-indigo-200">AI Analysis — Recommended Action</h3>
+                                        <h3 className="text-lg font-semibold text-indigo-600">AI Analysis — Recommended Action</h3>
                                         <p className="text-sm text-slate-200 mt-2 leading-relaxed max-w-3xl">{reportData.aiDescription}</p>
                                     </div>
                                 </div>
@@ -266,7 +266,7 @@ const TransactionReport: React.FC = () => {
                             <span className="text-sm font-medium text-slate-400">Responsible Party</span>
                             <p className="text-lg font-semibold text-white mt-1 capitalize">{reportData.cause.type}</p>
                             {reportData.cause.type === 'yuno' && reportData.cause.details?.yunoComponent && (
-                                <span className="inline-block mt-2 px-3 py-1 bg-purple-900/40 text-purple-300 text-xs font-medium rounded-full border border-purple-800">
+                                <span className="inline-block mt-2 px-3 py-1 bg-purple-700/20 text-purple-600 text-xs font-medium rounded-full border border-purple-600">
                   {reportData.cause.details.yunoComponent.toUpperCase()}
                 </span>
                             )}
@@ -280,7 +280,7 @@ const TransactionReport: React.FC = () => {
                                 <span className="text-sm font-medium text-slate-400">Missing Parameters</span>
                                 <div className="flex flex-wrap gap-2 mt-2">
                                     {reportData.cause.details.missingParams.map((param, idx) => (
-                                        <span key={idx} className="px-2 py-1 bg-red-900/50 text-red-300 text-xs font-mono rounded border border-red-800">
+                                        <span key={idx} className="px-2 py-1 bg-red-600/20 text-red-600 text-xs font-mono rounded border border-red-600">
                       {param}
                     </span>
                                     ))}
