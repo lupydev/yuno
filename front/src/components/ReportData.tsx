@@ -1,6 +1,6 @@
 import React, { useState, useRef } from 'react';
 import { BarChart, Bar, LineChart, Line, PieChart, Pie, Cell, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer } from 'recharts';
-import { CheckCircle, AlertCircle, Clock, BarChart3 } from 'lucide-react';
+import { CheckCircle, AlertCircle, Clock, BarChart3, Eye, EyeOff } from 'lucide-react';
 
 interface ReportData {
     title: string;
@@ -9,6 +9,7 @@ interface ReportData {
     status: 'pending' | 'in-progress' | 'resolved' | 'rejected';
     aiSolution: string;
     humanSolution: string;
+    humanBy?: string;
     date: string;
     approvalDistribution: Array<{ status: string; count: number }>;
     successRate: Array<{ hour: string; rate: number }>;
@@ -34,6 +35,7 @@ const TransactionReport: React.FC = () => {
         status: 'in-progress',
         aiSolution: 'Implement retry mechanism with exponential backoff. Increase timeout threshold from 5s to 10s during peak hours. Add circuit breaker pattern to prevent cascading failures.',
         humanSolution: 'After analysis, confirmed AI recommendation. Additionally implementing request queuing system and adding fallback provider. ETA: 48 hours.',
+        humanBy: 'Alice Johnson',
         date: '2025-12-13T14:30:00',
         approvalDistribution: [
             { status: 'Approved', count: 1245 },
@@ -155,6 +157,8 @@ const TransactionReport: React.FC = () => {
         ]
     });
 
+    const [aiHidden, setAiHidden] = useState(false);
+
     const statusColors = {
         pending: 'bg-slate-700 text-slate-300',
         'in-progress': 'bg-indigo-900 text-indigo-300',
@@ -165,6 +169,7 @@ const TransactionReport: React.FC = () => {
     const pieColors = ['#10b981', '#ef4444', '#f59e0b'];
 
     const graphsRef = useRef<HTMLDivElement>(null);
+    const [activeChart, setActiveChart] = useState<'failed'|'latency'|'technical'|'approval'|'success'>('failed');
 
     const scrollToGraphs = () => {
         graphsRef.current?.scrollIntoView({ behavior: 'smooth', block: 'start' });
@@ -178,7 +183,9 @@ const TransactionReport: React.FC = () => {
                     <div className="flex items-center gap-3 text-sm text-slate-400">
                         <span className="px-2 py-1 bg-slate-800/40 rounded-md text-slate-200">Reports</span>
                         <span className="text-slate-500">/</span>
-                        <span className="text-slate-300 font-medium">View Report</span>
+                        <span className="text-slate-300 font-medium">{reportData.cause.details?.clientName || 'Merchant'}</span>
+                        <span className="text-slate-500">/</span>
+                        <span className="text-slate-300">{reportData.title}</span>
                     </div>
                     <button className="text-sm px-3 py-1 bg-slate-800/40 rounded-md hover:bg-slate-800/50">Back to list</button>
                 </div>
@@ -212,20 +219,35 @@ const TransactionReport: React.FC = () => {
                                     <span className="text-sm font-medium text-amber-300">Pending Review</span>
                                 </div>
                             )}
-                            <button
-                                onClick={scrollToGraphs}
-                                className="flex items-center gap-2 px-4 py-2 bg-indigo-600 hover:bg-indigo-700 text-white rounded-md transition-colors duration-200 font-medium"
-                            >
-                                <BarChart3 className="w-5 h-5" />
-                                Jump to Graphs
-                            </button>
+
                         </div>
                     </div>
 
-                    <div className="border-t border-slate-800/30 pt-4">
-                        <h3 className="text-sm font-semibold text-slate-300 mb-2">AI Analysis</h3>
-                        <p className="text-slate-300 leading-relaxed">{reportData.aiDescription}</p>
-                    </div>
+                    { !aiHidden ? (
+                        <div className="mb-6 p-6 rounded-lg bg-indigo-600/10 border-l-4 border-indigo-500">
+                            <div className="flex items-start justify-between">
+                                <div className="flex items-start gap-4">
+                                    <AlertCircle className="w-6 h-6 text-indigo-400 mt-1" />
+                                    <div>
+                                        <h3 className="text-lg font-semibold text-indigo-200">AI Analysis — Recommended Action</h3>
+                                        <p className="text-sm text-slate-200 mt-2 leading-relaxed max-w-3xl">{reportData.aiDescription}</p>
+                                    </div>
+                                </div>
+                                <div>
+                                    <button onClick={() => setAiHidden(true)} className="p-2 rounded-md bg-slate-800/30 hover:bg-slate-800/40 transition" aria-label="Hide AI analysis">
+                                        <EyeOff className="w-5 h-5 text-slate-200" />
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                    ) : (
+                        <div className="mb-6 flex justify-end">
+                            <button onClick={() => setAiHidden(false)} className="p-2 rounded-md bg-slate-800/30 hover:bg-slate-800/40 transition" aria-label="Show AI analysis">
+                                <Eye className="w-5 h-5 text-slate-200" />
+                            </button>
+                        </div>
+                    )}
+
                 </div>
 
                 {/* Cause Analysis */}
@@ -245,10 +267,6 @@ const TransactionReport: React.FC = () => {
                             <span className="text-sm font-medium text-slate-400">Provider</span>
                             <p className="text-lg font-semibold text-white mt-1">{reportData.cause.details?.providerName || 'N/A'}</p>
                         </div>
-                        <div className="border border-slate-800/30 rounded-lg p-4 bg-slate-900/40">
-                            <span className="text-sm font-medium text-slate-400">Client/Merchant</span>
-                            <p className="text-lg font-semibold text-white mt-1">{reportData.cause.details?.clientName || 'N/A'}</p>
-                        </div>
                         {reportData.cause.details?.missingParams && reportData.cause.details.missingParams.length > 0 && (
                             <div className="border border-slate-800/30 rounded-lg p-4 bg-slate-900/40">
                                 <span className="text-sm font-medium text-slate-400">Missing Parameters</span>
@@ -261,6 +279,11 @@ const TransactionReport: React.FC = () => {
                                 </div>
                             </div>
                         )}
+
+                        <div className="border border-slate-800/30 rounded-lg p-4 bg-slate-900/40">
+                            <span className="text-sm font-medium text-slate-400">Problem</span>
+                            <p className="text-sm text-slate-300 mt-1">{reportData.aiDescription.slice(0, 120)}{reportData.aiDescription.length > 120 ? '' : ''}</p>
+                        </div>
                     </div>
                 </div>
 
@@ -271,130 +294,155 @@ const TransactionReport: React.FC = () => {
                         <p className="text-slate-300 leading-relaxed">{reportData.aiSolution}</p>
                     </div>
                     <div className="bg-gradient-to-br from-slate-900/50 to-slate-900/30 rounded-xl p-6 border border-slate-800/20 shadow-sm">
-                        <h2 className="text-xl font-bold text-white mb-4">Human Solution</h2>
+                        <div className="flex items-center justify-between mb-4">
+                            <h2 className="text-xl font-bold text-white">Human Solution</h2>
+                            <div className="text-sm text-slate-300">Executed by: <span className="font-medium text-white">{reportData.humanBy || '—'}</span></div>
+                        </div>
                         <p className="text-slate-300 leading-relaxed">{reportData.humanSolution}</p>
                     </div>
                 </div>
 
                 {/* Charts */}
-                <div ref={graphsRef} className="bg-gradient-to-b from-slate-900/60 to-slate-900/40 rounded-xl p-6 border border-slate-800/20 shadow-sm">
-                    <h2 className="text-xl font-bold text-gray-100 mb-6">Failed Transactions by Hour</h2>
-                    <ResponsiveContainer width="100%" height={300}>
-                        <BarChart data={reportData.failedTransactions}>
-                            <CartesianGrid strokeDasharray="3 3" stroke="#374151" />
-                            <XAxis dataKey="hour" tick={{ fontSize: 12, fill: '#9ca3af' }} stroke="#6b7280" />
-                            <YAxis tick={{ fill: '#9ca3af' }} stroke="#6b7280" />
-                            <Tooltip
-                                contentStyle={{ backgroundColor: '#1f2937', border: '1px solid #374151', borderRadius: '8px' }}
-                                labelStyle={{ color: '#f3f4f6' }}
-                                itemStyle={{ color: '#e5e7eb' }}
-                            />
-                            <Legend wrapperStyle={{ color: '#9ca3af' }} />
-                            <Bar dataKey="count" fill="#ef4444" name="Failed Transactions" />
-                        </BarChart>
-                    </ResponsiveContainer>
-                </div>
-
-                <div className="bg-gradient-to-br from-slate-900/50 to-slate-900/30 rounded-xl p-6 border border-slate-800/20 shadow-sm">
-                    <h2 className="text-xl font-bold text-white mb-6">Latency by Hour</h2>
-                    <ResponsiveContainer width="100%" height={300}>
-                        <LineChart data={reportData.latency}>
-                            <CartesianGrid strokeDasharray="3 3" stroke="#374151" />
-                            <XAxis dataKey="hour" tick={{ fontSize: 12, fill: '#9ca3af' }} stroke="#6b7280" />
-                            <YAxis tick={{ fill: '#9ca3af' }} stroke="#6b7280" />
-                            <Tooltip
-                                contentStyle={{ backgroundColor: '#1f2937', border: '1px solid #374151', borderRadius: '8px' }}
-                                labelStyle={{ color: '#f3f4f6' }}
-                                itemStyle={{ color: '#e5e7eb' }}
-                            />
-                            <Legend wrapperStyle={{ color: '#9ca3af' }} />
-                            <Line type="monotone" dataKey="ms" stroke="#3b82f6" strokeWidth={2} name="Latency (ms)" />
-                        </LineChart>
-                    </ResponsiveContainer>
-                </div>
-
-                <div className="bg-gradient-to-br from-slate-900/50 to-slate-900/30 rounded-xl p-6 border border-slate-800/20 shadow-sm">
-                    <h2 className="text-xl font-bold text-white mb-6">Technical Errors by Hour</h2>
-                    <ResponsiveContainer width="100%" height={300}>
-                        <BarChart data={reportData.technicalErrors}>
-                            <CartesianGrid strokeDasharray="3 3" stroke="#374151" />
-                            <XAxis dataKey="hour" tick={{ fontSize: 12, fill: '#9ca3af' }} stroke="#6b7280" />
-                            <YAxis tick={{ fill: '#9ca3af' }} stroke="#6b7280" />
-                            <Tooltip
-                                contentStyle={{ backgroundColor: '#1f2937', border: '1px solid #374151', borderRadius: '8px' }}
-                                labelStyle={{ color: '#f3f4f6' }}
-                                itemStyle={{ color: '#e5e7eb' }}
-                            />
-                            <Legend wrapperStyle={{ color: '#9ca3af' }} />
-                            <Bar dataKey="400" fill="#f59e0b" name="400 Bad Request" />
-                            <Bar dataKey="500" fill="#ef4444" name="500 Internal Server Error" />
-                            <Bar dataKey="502" fill="#dc2626" name="502 Bad Gateway" />
-                            <Bar dataKey="503" fill="#991b1b" name="503 Service Unavailable" />
-                            <Bar dataKey="504" fill="#7f1d1d" name="504 Gateway Timeout" />
-                        </BarChart>
-                    </ResponsiveContainer>
-                </div>
-
-                <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-                    <div className="bg-gradient-to-br from-slate-900/50 to-slate-900/30 rounded-xl p-6 border border-slate-800/20 shadow-sm">
-                        <h2 className="text-xl font-bold text-white mb-6">Approval Status Distribution</h2>
-                        <div className="flex items-center justify-center">
-                            <ResponsiveContainer width="100%" height={350}>
-                                <PieChart>
-                                    <Pie
-                                        data={reportData.approvalDistribution}
-                                        cx="50%"
-                                        cy="50%"
-                                        labelLine={false}
-                                        label={({ status, count, percent }) => `${status}: ${count} (${(percent * 100).toFixed(0)}%)`}
-                                        outerRadius={100}
-                                        fill="#8884d8"
-                                        dataKey="count"
-                                    >
-                                        {reportData.approvalDistribution.map((entry, index) => (
-                                            <Cell key={`cell-${index}`} fill={pieColors[index % pieColors.length]} />
-                                        ))}
-                                    </Pie>
-                                    <Tooltip
-                                        contentStyle={{ backgroundColor: '#1f2937', border: '1px solid #374151', borderRadius: '8px' }}
-                                        labelStyle={{ color: '#f3f4f6' }}
-                                        itemStyle={{ color: '#e5e7eb' }}
-                                    />
-                                </PieChart>
-                            </ResponsiveContainer>
-                        </div>
+                <div>
+                    <div className="flex gap-2 mb-4">
+                        <button onClick={() => setActiveChart('failed')} className={`px-3 py-1 rounded-md text-sm font-medium ${activeChart === 'failed' ? 'bg-slate-800 text-white' : 'text-slate-400 hover:bg-slate-800'}`}>Failed Transactions</button>
+                        <button onClick={() => setActiveChart('latency')} className={`px-3 py-1 rounded-md text-sm font-medium ${activeChart === 'latency' ? 'bg-slate-800 text-white' : 'text-slate-400 hover:bg-slate-800'}`}>Latency</button>
+                        <button onClick={() => setActiveChart('technical')} className={`px-3 py-1 rounded-md text-sm font-medium ${activeChart === 'technical' ? 'bg-slate-800 text-white' : 'text-slate-400 hover:bg-slate-800'}`}>Technical Errors</button>
+                        <button onClick={() => setActiveChart('approval')} className={`px-3 py-1 rounded-md text-sm font-medium ${activeChart === 'approval' ? 'bg-slate-800 text-white' : 'text-slate-400 hover:bg-slate-800'}`}>Approval Distribution</button>
+                        <button onClick={() => setActiveChart('success')} className={`px-3 py-1 rounded-md text-sm font-medium ${activeChart === 'success' ? 'bg-slate-800 text-white' : 'text-slate-400 hover:bg-slate-800'}`}>Success Rate</button>
                     </div>
 
-                    <div className="bg-gradient-to-br from-slate-900/50 to-slate-900/30 rounded-xl p-6 border border-slate-800/20 shadow-sm">
-                        <h2 className="text-xl font-bold text-white mb-6">Transaction Success Rate by Hour</h2>
-                        <ResponsiveContainer width="100%" height={350}>
-                            <LineChart data={reportData.successRate}>
-                                <CartesianGrid strokeDasharray="3 3" stroke="#374151" />
-                                <XAxis dataKey="hour" tick={{ fontSize: 12, fill: '#9ca3af' }} stroke="#6b7280" />
-                                <YAxis
-                                    domain={[0, 100]}
-                                    tick={{ fill: '#9ca3af' }}
-                                    stroke="#6b7280"
-                                    label={{ value: 'Success Rate (%)', angle: -90, position: 'insideLeft', fill: '#9ca3af' }}
-                                />
-                                <Tooltip
-                                    contentStyle={{ backgroundColor: '#1f2937', border: '1px solid #374151', borderRadius: '8px' }}
-                                    labelStyle={{ color: '#f3f4f6' }}
-                                    itemStyle={{ color: '#e5e7eb' }}
-                                    formatter={(value: number) => `${value.toFixed(1)}%`}
-                                />
-                                <Legend wrapperStyle={{ color: '#9ca3af' }} />
-                                <Line
-                                    type="monotone"
-                                    dataKey="rate"
-                                    stroke="#10b981"
-                                    strokeWidth={3}
-                                    name="Success Rate (%)"
-                                    dot={{ fill: '#10b981', r: 4 }}
-                                    activeDot={{ r: 6 }}
-                                />
-                            </LineChart>
-                        </ResponsiveContainer>
+                    <div className="bg-gradient-to-b from-slate-900/60 to-slate-900/40 rounded-xl p-6 border border-slate-800/20 shadow-sm">
+                        {activeChart === 'failed' && (
+                            <>
+                                <h2 className="text-xl font-bold text-gray-100 mb-6">Failed Transactions by Hour</h2>
+                                <ResponsiveContainer width="100%" height={300}>
+                                    <BarChart data={reportData.failedTransactions}>
+                                        <CartesianGrid strokeDasharray="3 3" stroke="#374151" />
+                                        <XAxis dataKey="hour" tick={{ fontSize: 12, fill: '#9ca3af' }} stroke="#6b7280" />
+                                        <YAxis tick={{ fill: '#9ca3af' }} stroke="#6b7280" />
+                                        <Tooltip
+                                            contentStyle={{ backgroundColor: '#1f2937', border: '1px solid #374151', borderRadius: '8px' }}
+                                            labelStyle={{ color: '#f3f4f6' }}
+                                            itemStyle={{ color: '#e5e7eb' }}
+                                        />
+                                        <Legend wrapperStyle={{ color: '#9ca3af' }} />
+                                        <Bar dataKey="count" fill="#ef4444" name="Failed Transactions" />
+                                    </BarChart>
+                                </ResponsiveContainer>
+                            </>
+                        )}
+
+                        {activeChart === 'latency' && (
+                            <>
+                                <h2 className="text-xl font-bold text-white mb-6">Latency by Hour</h2>
+                                <ResponsiveContainer width="100%" height={300}>
+                                    <LineChart data={reportData.latency}>
+                                        <CartesianGrid strokeDasharray="3 3" stroke="#374151" />
+                                        <XAxis dataKey="hour" tick={{ fontSize: 12, fill: '#9ca3af' }} stroke="#6b7280" />
+                                        <YAxis tick={{ fill: '#9ca3af' }} stroke="#6b7280" />
+                                        <Tooltip
+                                            contentStyle={{ backgroundColor: '#1f2937', border: '1px solid #374151', borderRadius: '8px' }}
+                                            labelStyle={{ color: '#f3f4f6' }}
+                                            itemStyle={{ color: '#e5e7eb' }}
+                                        />
+                                        <Legend wrapperStyle={{ color: '#9ca3af' }} />
+                                        <Line type="monotone" dataKey="ms" stroke="#3b82f6" strokeWidth={2} name="Latency (ms)" animationDuration={450} />
+                                    </LineChart>
+                                </ResponsiveContainer>
+                            </>
+                        )}
+
+                        {activeChart === 'technical' && (
+                            <>
+                                <h2 className="text-xl font-bold text-white mb-6">Technical Errors by Hour</h2>
+                                <ResponsiveContainer width="100%" height={300}>
+                                    <BarChart data={reportData.technicalErrors}>
+                                        <CartesianGrid strokeDasharray="3 3" stroke="#374151" />
+                                        <XAxis dataKey="hour" tick={{ fontSize: 12, fill: '#9ca3af' }} stroke="#6b7280" />
+                                        <YAxis tick={{ fill: '#9ca3af' }} stroke="#6b7280" />
+                                        <Tooltip
+                                            contentStyle={{ backgroundColor: '#1f2937', border: '1px solid #374151', borderRadius: '8px' }}
+                                            labelStyle={{ color: '#f3f4f6' }}
+                                            itemStyle={{ color: '#e5e7eb' }}
+                                        />
+                                        <Legend wrapperStyle={{ color: '#9ca3af' }} />
+                                        <Bar dataKey="400" fill="#f59e0b" name="400 Bad Request" />
+                                        <Bar dataKey="500" fill="#ef4444" name="500 Internal Server Error" />
+                                        <Bar dataKey="502" fill="#dc2626" name="502 Bad Gateway" />
+                                        <Bar dataKey="503" fill="#991b1b" name="503 Service Unavailable" />
+                                        <Bar dataKey="504" fill="#7f1d1d" name="504 Gateway Timeout" />
+                                    </BarChart>
+                                </ResponsiveContainer>
+                            </>
+                        )}
+
+                        {activeChart === 'approval' && (
+                            <>
+                                <h2 className="text-xl font-bold text-white mb-6">Approval Status Distribution</h2>
+                                <div className="flex items-center justify-center">
+                                    <ResponsiveContainer width="100%" height={350}>
+                                        <PieChart>
+                                            <Pie
+                                                data={reportData.approvalDistribution}
+                                                cx="50%"
+                                                cy="50%"
+                                                labelLine={false}
+                                                label={({ status, count, percent }) => `${status}: ${count} (${(percent * 100).toFixed(0)}%)`}
+                                                outerRadius={100}
+                                                fill="#8884d8"
+                                                animationDuration={450}
+                                                dataKey="count"
+                                            >
+                                                {reportData.approvalDistribution.map((entry, index) => (
+                                                    <Cell key={`cell-${index}`} fill={pieColors[index % pieColors.length]} />
+                                                ))}
+                                            </Pie>
+                                            <Tooltip
+                                                contentStyle={{ backgroundColor: '#1f2937', border: '1px solid #374151', borderRadius: '8px' }}
+                                                labelStyle={{ color: '#f3f4f6' }}
+                                                itemStyle={{ color: '#e5e7eb' }}
+                                            />
+                                        </PieChart>
+                                    </ResponsiveContainer>
+                                </div>
+                            </>
+                        )}
+
+                        {activeChart === 'success' && (
+                            <>
+                                <h2 className="text-xl font-bold text-white mb-6">Transaction Success Rate by Hour</h2>
+                                <ResponsiveContainer width="100%" height={350}>
+                                    <LineChart data={reportData.successRate}>
+                                        <CartesianGrid strokeDasharray="3 3" stroke="#374151" />
+                                        <XAxis dataKey="hour" tick={{ fontSize: 12, fill: '#9ca3af' }} stroke="#6b7280" />
+                                        <YAxis
+                                            domain={[0, 100]}
+                                            tick={{ fill: '#9ca3af' }}
+                                            stroke="#6b7280"
+                                            label={{ value: 'Success Rate (%)', angle: -90, position: 'insideLeft', fill: '#9ca3af' }}
+                                        />
+                                        <Tooltip
+                                            contentStyle={{ backgroundColor: '#1f2937', border: '1px solid #374151', borderRadius: '8px' }}
+                                            labelStyle={{ color: '#f3f4f6' }}
+                                            itemStyle={{ color: '#e5e7eb' }}
+                                            formatter={(value: number) => `${value.toFixed(1)}%`}
+                                        />
+                                        <Legend wrapperStyle={{ color: '#9ca3af' }} />
+                                        <Line
+                                            type="monotone"
+                                            dataKey="rate"
+                                            stroke="#10b981"
+                                            strokeWidth={3}
+                                            animationDuration={450}
+                                            name="Success Rate (%)"
+                                            dot={{ fill: '#10b981', r: 4 }}
+                                            activeDot={{ r: 6 }}
+                                        />
+                                    </LineChart>
+                                </ResponsiveContainer>
+                            </>
+                        )}
                     </div>
                 </div>
             </div>

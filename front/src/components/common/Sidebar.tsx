@@ -17,26 +17,15 @@ const Sidebar: React.FC<SidebarProps> = ({ sidebarOpen, setSidebarOpen }) => {
     ];
 
     return (
-        <div className={`${sidebarOpen ? 'w-64' : 'w-20'} bg-slate-900 border-r border-slate-800 transition-all duration-300 flex flex-col`}>
+        <div className={`${sidebarOpen ? 'w-64' : 'w-20 hover:w-64'} bg-slate-900 border-r border-slate-800 transition-all duration-300 flex flex-col group`}>
             {/* Logo + Toggle */}
             <div className="p-6 border-b border-slate-800 flex items-center justify-between">
-                {sidebarOpen && <div className="text-2xl font-bold text-white">YUNO</div>}
+                <div className={`text-2xl font-bold text-white transition-opacity duration-200 ${sidebarOpen ? 'opacity-100' : 'opacity-0 group-hover:opacity-100'}`}>YUNO</div>
                 <button onClick={() => setSidebarOpen(!sidebarOpen)} className="p-2 hover:bg-slate-800 rounded-lg">
                     <Menu className="w-5 h-5" />
                 </button>
             </div>
 
-            <div className="flex h-screen bg-slate-950 text-slate-100">
-                {/* Sidebar stays as is */}
-                <Sidebar />
-
-                {/* Main content scrolls */}
-                <div className="flex-1 overflow-auto">
-                    <div className="p-8 max-w-[1800px] mx-auto">
-                        {/* Your dashboard content here */}
-                    </div>
-                </div>
-            </div>
 
 
             {/* Navigation */}
@@ -50,7 +39,7 @@ const Sidebar: React.FC<SidebarProps> = ({ sidebarOpen, setSidebarOpen }) => {
                         `}
                     >
                         <item.icon className="w-5 h-5" />
-                        {sidebarOpen && <span className="font-medium">{item.label}</span>}
+                        <span className={`font-medium transition-opacity duration-200 ${sidebarOpen ? 'opacity-100' : 'opacity-0 group-hover:opacity-100'}`}>{item.label}</span>
                     </button>
                 ))}
             </nav>
@@ -59,7 +48,7 @@ const Sidebar: React.FC<SidebarProps> = ({ sidebarOpen, setSidebarOpen }) => {
             <div className="p-4 border-t border-slate-800">
                 <button className="w-full flex items-center gap-3 px-4 py-3 rounded-lg text-slate-400 hover:bg-slate-800 hover:text-slate-200 transition-colors">
                     <Bell className="w-5 h-5" />
-                    {sidebarOpen && <span className="font-medium">Notifications</span>}
+                    <span className={`font-medium transition-opacity duration-200 ${sidebarOpen ? 'opacity-100' : 'opacity-0 group-hover:opacity-100'}`}>Notifications</span>
                 </button>
             </div>
         </div>

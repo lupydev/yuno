@@ -18,7 +18,7 @@ const DashboardAdmin: React.FC = () => {
 
     // KPI mock data
     const kpis = [
-        { label: 'Success Rate', value: '94.2%', change: -2.3, status: 'warning' },
+        { label: 'Payment Gateway Timeout Issue', value: '94.2%', change: -2.3, status: 'warning' },
         { label: 'Error Rate', value: '5.8%', change: 2.3, status: 'error' },
         { label: 'Transactions', value: '12,847', change: 8.5, status: 'good' },
         { label: 'Conversion', value: '67.3%', change: -1.2, status: 'warning' }
