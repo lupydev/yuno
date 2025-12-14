@@ -225,3 +225,6 @@ pnpm-debug.log*
 
 # coverage for tests
 coverage/
+
+.idea
+.vscode
