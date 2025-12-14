@@ -50,8 +50,8 @@ class UserUpdate(BaseModel):
     password: str | None = Field(
         None, min_length=8, description="User password")
     role: Roles | None = Field(None, description="User role")
-    team_id: UUID | None = Field(
-        None, description="Team UUID (only for DEVELOPER role)")
+    team_id: str | None = Field(
+        None, description="Team name (only for DEVELOPER/TEAM_LEADER roles)")
     is_active: bool | None = Field(None, description="Account status")
 
     model_config = {
