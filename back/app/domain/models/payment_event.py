@@ -27,8 +27,6 @@ class NormalizedPaymentEvent(SQLModel, table=True):
     Las validaciones de negocio están en los schemas (normalization_schemas.py).
     """
 
-    __tablename__ = "normalized_payment_events"
-
     # Índices compuestos para queries comunes (Best Practice)
     __table_args__ = (
         sqlalchemy.Index("idx_created_at", "created_at"),
@@ -58,7 +56,7 @@ class NormalizedPaymentEvent(SQLModel, table=True):
         default=None, description="Specific failure reason if applicable"
     )
 
-    # Financial
+    # Financial (dual storage: original + USD equivalent for analytics)
     amount: Decimal = Field(
         max_digits=15,
         decimal_places=2,
@@ -67,6 +65,12 @@ class NormalizedPaymentEvent(SQLModel, table=True):
     currency: str = Field(
         max_length=3,
         description="ISO 4217 currency code (USD, EUR, MXN, etc.)",
+    )
+    amount_usd_equivalent: Decimal | None = Field(
+        default=None,
+        max_digits=15,
+        decimal_places=2,
+        description="Amount converted to USD for analytics (using exchange rate at normalization time)",
     )
 
     # Provider Details
