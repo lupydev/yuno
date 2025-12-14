@@ -27,12 +27,11 @@ export const EditUserModal: React.FC<EditUserModalProps> = ({
         name: user.name || '',
         email: user.email,
         team: user.team || '',
-        role: user.role,
         status: user.status || 'active'
     });
 
     const handleSubmit = () => {
-        if (!formData.name || !formData.email || !formData.team || !formData.role) {
+        if (!formData.name || !formData.email || !formData.team) {
             alert('Por favor completa todos los campos');
             return;
         }
