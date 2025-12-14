@@ -1,7 +1,13 @@
 import React, { useState } from 'react';
 import { ChevronDown, X } from 'lucide-react';
 
-const FilterBar = () => {
+interface FilterBarProps {
+    onChange?: (filters: { merchant: string | null; country: string | null; provider: string | null; method: string | null }) => void;
+    merchants?: string[];
+    providers?: string[];
+}
+
+const FilterBar: React.FC<FilterBarProps> = ({ onChange, merchants, providers }) => {
     const [activeFilter, setActiveFilter] = useState<string | null>(null);
     const [selectedFilters, setSelectedFilters] = useState({
         merchant: null,
@@ -11,9 +17,18 @@ const FilterBar = () => {
     });
 
     const filterOptions = {
-        merchant: ['Shopito', 'StoreX', 'MegaShop', 'TechStore', 'FashionHub'],
-        country: ['United States', 'United Kingdom', 'Germany', 'France', 'Spain', 'Mexico', 'Colombia'],
-        provider: ['Stripe', 'PayPal', 'Adyen', 'BAC', 'Square'],
+        merchant: merchants && merchants.length > 0 ? merchants : ['Shopito', 'StoreX', 'MegaShop', 'TechStore', 'FashionHub'],
+        // countries store value as ISO code with a human label
+        country: [
+            { label: 'United States', value: 'US' },
+            { label: 'United Kingdom', value: 'GB' },
+            { label: 'Germany', value: 'DE' },
+            { label: 'France', value: 'FR' },
+            { label: 'Spain', value: 'ES' },
+            { label: 'Mexico', value: 'MX' },
+            { label: 'Colombia', value: 'CO' }
+        ],
+        provider: providers && providers.length > 0 ? providers : ['Stripe', 'PayPal', 'Adyen', 'BAC', 'Square'],
         method: ['Tarjeta', 'PSE', 'Wallet', 'Bank Transfer', 'Cash']
     };
 
@@ -28,19 +43,28 @@ const FilterBar = () => {
         setActiveFilter(activeFilter === filterType ? null : filterType);
     };
 
+    const notifyChange = (newFilters: any) => {
+        if (onChange) onChange(newFilters);
+    };
+
     const selectOption = (filterType: string, option: string) => {
-        setSelectedFilters(prev => ({
-            ...prev,
-            [filterType]: prev[filterType] === option ? null : option
-        }));
+        setSelectedFilters(prev => {
+            const next = ({
+                ...prev,
+                [filterType]: prev[filterType] === option ? null : option
+            });
+            notifyChange(next);
+            return next;
+        });
         setActiveFilter(null);
     };
 
     const clearFilter = (filterType: string) => {
-        setSelectedFilters(prev => ({
-            ...prev,
-            [filterType]: null
-        }));
+        setSelectedFilters(prev => {
+            const next = ({ ...prev, [filterType]: null });
+            notifyChange(next);
+            return next;
+        });
     };
 
     return (
@@ -55,7 +79,11 @@ const FilterBar = () => {
                                 : 'bg-slate-900 border-slate-700 text-slate-300 hover:border-slate-600'
                         }`}
                     >
-                        {selectedFilters[filterType] || filterLabels[filterType]}
+                        {filterType === 'country'
+                            ? (selectedFilters[filterType]
+                                ? filterOptions.country.find((c: any) => c.value === selectedFilters[filterType])?.label
+                                : filterLabels[filterType])
+                            : (selectedFilters[filterType] || filterLabels[filterType])}
                         {selectedFilters[filterType] ? (
                             <X
                                 className="w-4 h-4"
@@ -71,17 +99,17 @@ const FilterBar = () => {
 
                     {activeFilter === filterType && (
                         <div className="absolute top-full mt-2 left-0 bg-slate-800 border border-slate-700 rounded-lg shadow-xl z-50 min-w-[200px] py-1">
-                            {filterOptions[filterType].map(option => (
+                            {filterOptions[filterType].map((option: any) => (
                                 <button
-                                    key={option}
-                                    onClick={() => selectOption(filterType, option)}
+                                    key={typeof option === 'string' ? option : option.value}
+                                    onClick={() => selectOption(filterType, typeof option === 'string' ? option : option.value)}
                                     className={`w-full px-4 py-2 text-left text-sm transition-colors ${
-                                        selectedFilters[filterType] === option
+                                        selectedFilters[filterType] === (typeof option === 'string' ? option : option.value)
                                             ? 'bg-blue-600 text-white'
                                             : 'text-slate-300 hover:bg-slate-700'
                                     }`}
                                 >
-                                    {option}
+                                    {typeof option === 'string' ? option : option.label}
                                 </button>
                             ))}
                         </div>
@@ -91,7 +119,11 @@ const FilterBar = () => {
 
             {Object.values(selectedFilters).some(v => v !== null) && (
                 <button
-                    onClick={() => setSelectedFilters({ merchant: null, country: null, provider: null, method: null })}
+                    onClick={() => {
+                        const cleared = { merchant: null, country: null, provider: null, method: null };
+                        setSelectedFilters(cleared);
+                        notifyChange(cleared);
+                    }}
                     className="px-4 py-2 text-sm text-slate-400 hover:text-white transition-colors"
                 >
                     Clear all

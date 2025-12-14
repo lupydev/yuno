@@ -227,6 +227,99 @@ def get_recent_events(
     }
 
 
+@router.get("/events/all")
+def get_all_transactions(
+    session: SessionDep,
+    skip: int = Query(0, ge=0, description="Número de registros a saltar"),
+    limit: int | None = Query(None, ge=1, description="Número de registros a retornar (si omito, retorna todos)"),
+    provider: str | None = Query(None, description="Filtrar por provider"),
+    merchant: str | None = Query(None, description="Filtrar por merchant"),
+    country: str | None = Query(None, description="Filtrar por country (ISO code)"),
+    payment_method: str | None = Query(None, description="Filtrar por método de pago (si está disponible en metadata)"),
+    start_date: datetime | None = Query(None, description="Fecha de inicio (ISO 8601)"),
+    end_date: datetime | None = Query(None, description="Fecha de fin (ISO 8601)"),
+) -> dict[str, Any]:
+
+    """
+    Lista de todas las transacciones (paginada) con campos esenciales para el dashboard
+
+    Retorna por evento:
+    - id
+    - failed (boolean)
+    - provider
+    - merchant_name
+    - country
+    - payment_method (si está disponible en metadata o raw_data)
+    - date (created_at)
+
+    Ejemplo:
+    GET /analytics/events/all?start_date=2025-12-13T00:00:00Z&end_date=2025-12-14T00:00:00Z&limit=100
+    """
+    query = select(NormalizedPaymentEvent).order_by(NormalizedPaymentEvent.created_at.desc())
+
+    if provider:
+        query = query.where(NormalizedPaymentEvent.provider == provider.lower())
+    if merchant:
+        query = query.where(NormalizedPaymentEvent.merchant_name == merchant)
+    if country:
+        query = query.where(NormalizedPaymentEvent.country == country.upper())
+    if start_date:
+        query = query.where(NormalizedPaymentEvent.created_at >= start_date)
+    if end_date:
+        query = query.where(NormalizedPaymentEvent.created_at <= end_date)
+
+    # Total count
+    count_query = select(func.count()).select_from(query.subquery())
+    total = session.exec(count_query).one()
+
+    # Apply pagination if limit is provided; otherwise return all matching events
+    query = query.offset(skip)
+    if limit is not None:
+        query = query.limit(limit)
+
+    events = session.exec(query).all()
+
+    def extract_payment_method(event: NormalizedPaymentEvent) -> str | None:
+        # Try event_metadata then raw_data for common keys
+        if event.event_metadata and isinstance(event.event_metadata, dict):
+            pm = event.event_metadata.get('payment_method') or event.event_metadata.get('method')
+            if pm:
+                return pm
+        if event.raw_data and isinstance(event.raw_data, dict):
+            pm = event.raw_data.get('payment_method') or event.raw_data.get('method')
+            if pm:
+                return pm
+        return None
+
+    # If payment_method filter is provided, apply it in-memory (best-effort)
+    if payment_method:
+        filtered = []
+        for event in events:
+            pm = extract_payment_method(event)
+            if pm and pm.lower() == payment_method.lower():
+                filtered.append(event)
+        events = filtered
+
+    return {
+        "total": total,
+        "skip": skip,
+        "limit": limit,
+        "transactions": [
+            {
+                "id": str(event.id),
+                "failed": (event.status_category.value != PaymentStatus.APPROVED.value),
+                "status_category": event.status_category.value,
+                "provider": event.provider,
+                "merchant_name": event.merchant_name,
+                "country": event.country,
+                "payment_method": extract_payment_method(event),
+                "date": event.created_at.isoformat(),
+            }
+            for event in events
+        ],
+    }
+
+
 @router.get("/events/by-merchant/{merchant_name}")
 def get_events_by_merchant(
     merchant_name: str,
