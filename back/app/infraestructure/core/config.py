@@ -52,7 +52,14 @@ class Settings(BaseSettings):
             return 7  # 7 days in production
         return 30  # 30 days in development
 
-    OPENAI_API_KEY: str
+    OPENAI_BASE_URL: str = "https://models.inference.ai.azure.com"
+    GITHUB_TOKEN: str
+    GEMINI_API_KEY: str
+    GEMINI_MODEL: str = "gemini-2.0-flash-lite"
+    OPENAI_API_KEY: str = ""  # No usado, mantenido por compatibilidad
+    OPENAI_MODEL: str = "gpt-4o-mini"
+    AI_TIMEOUT_SECONDS: int = 10
+    AI_MAX_RETRIES: int = 2
 
     # postgres
     POSTGRES_SERVER: str
