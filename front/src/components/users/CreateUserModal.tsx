@@ -47,8 +47,9 @@ export const CreateUserModal: React.FC<CreateUserModalProps> = ({
             return;
         }
 
-        if (!formData.email.includes('@')) {
-            alert('Please enter a valid email');
+        const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+        if (!emailRegex.test(formData.email)) {
+            alert('Por favor ingresa un email válido');
             return;
         }
 

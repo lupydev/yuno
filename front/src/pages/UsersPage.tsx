@@ -66,12 +66,11 @@ export const UsersPage: React.FC = () => {
     const fetchTeams = async () => {
         try {
             const response = await apiBackClient.get("/teams/names/all");
-            // El endpoint devuelve directamente un array de strings
             setTeams(response.data);
         } catch (err) {
             console.error("Error al cargar equipos:", err);
-            // Fallback a equipos por defecto en caso de error
-            setTeams([]);
+            // Mantener equipos existentes en caso de error
+            // No limpiar el array para no romper la funcionalidad
         }
     };
 
@@ -126,27 +125,20 @@ export const UsersPage: React.FC = () => {
 
     const handleSaveUser = async (updatedUser: User) => {
         try {
-            // Construir objeto solo con campos que cambiaron
             const updateData: any = {};
-            
             const originalUser = users.find(u => u.id === updatedUser.id);
+            
             if (!originalUser) return;
 
+            // Solo agregar campos que cambiaron
             if (updatedUser.name !== originalUser.name) {
                 updateData.name = updatedUser.name;
             }
             if (updatedUser.email !== originalUser.email) {
                 updateData.email = updatedUser.email;
             }
-            // El rol siempre es DEVELOPER para developers
-            updateData.role = 'DEVELOPER';
-            
             if (updatedUser.team !== originalUser.team) {
-                if (updatedUser.team && updatedUser.team !== 'Sin equipo') {
-                    updateData.team_id = updatedUser.team;
-                } else {
-                    updateData.team_id = null;
-                }
+                updateData.team_id = updatedUser.team && updatedUser.team !== 'Sin equipo' ? updatedUser.team : null;
             }
             if (updatedUser.status !== originalUser.status) {
                 updateData.is_active = updatedUser.status === 'active';
