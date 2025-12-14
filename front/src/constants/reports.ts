@@ -53,11 +53,11 @@ export const UI_MESSAGES = {
 
 // API endpoints
 export const API_ENDPOINTS = {
-  REPORTS: '/reports',
-  MERCHANTS: '/merchants',
-  PROVIDERS: '/providers',
-  PROVIDERS_BY_MERCHANT: (merchantId: string) => `/merchants/${merchantId}/providers`,
-  REPORT_BY_ID: (transactionId: string) => `/reports/${transactionId}`,
+  REPORTS: '/alert-reports',
+  MERCHANTS: '/analytics/merchants',
+  PROVIDERS: '/analytics/providers',
+  PROVIDERS_BY_MERCHANT: (merchantId: string) => `/analytics/providers?merchant=${merchantId}`,
+  REPORT_BY_ID: (transactionId: string) => `/alert-reports/${transactionId}`,
 } as const;
 
 // Date format options

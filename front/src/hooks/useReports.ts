@@ -19,7 +19,10 @@ interface UseReportsReturn {
  * @param reports - Array of all reports
  * @returns Object with filtered/paginated reports and handler functions
  */
-export const useReports = (reports: Report[]): UseReportsReturn => {
+export const useReports = (reports: Report[] | any): UseReportsReturn => {
+  // Normalize reports input in case the API returns an object with data/reports
+  const reportsArray: Report[] = Array.isArray(reports) ? reports : (reports && (reports.reports || reports.data) ? (reports.reports || reports.data) : []);
+
   const [filters, setFilters] = useState<ReportFilters>({
     merchant: '',
     providers: []
@@ -28,8 +31,8 @@ export const useReports = (reports: Report[]): UseReportsReturn => {
 
   // Filter reports based on active filters
   const filteredReports = useMemo(
-    () => filterReports(reports, filters),
-    [reports, filters]
+    () => filterReports(reportsArray, filters),
+    [reportsArray, filters]
   );
 
   // Paginate filtered reports
