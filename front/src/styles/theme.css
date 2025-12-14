@@ -2,19 +2,21 @@
 
 [data-theme="light"] body {
   background-color: #f3f4f6 !important; /* slightly greyish */
-  color: #0f172a !important; /* slate-900 */
+}
+
+/* Ensure text classes that force white are dark in light mode */
+[data-theme="light"] .text-white,
+[data-theme="light"] .text-slate-100,
+[data-theme="light"] .text-slate-200,
+[data-theme="light"] .text-slate-300 {
+  color: #0f172a !important; /* dark text for readability */
 }
 
 /* Background surfaces */
-[data-theme="light"] .bg-slate-900 { background-color: #ffffff !important; }
+[data-theme="light"] .bg-slate-900 { background-color: #f3f4f6 !important; }
 [data-theme="light"] .bg-slate-950 { background-color: #f8fafc !important; }
 [data-theme="light"] .bg-slate-800 { background-color: #f1f5f9 !important; }
 
-/* Text colors */
-[data-theme="light"] .text-white { color: #0f172a !important; }
-[data-theme="light"] .text-slate-100 { color: #0f172a !important; }
-[data-theme="light"] .text-slate-200 { color: #334155 !important; }
-[data-theme="light"] .text-slate-300 { color: #475569 !important; }
 
 /* Borders */
 [data-theme="light"] .border-slate-800 { border-color: #e2e8f0 !important; }
