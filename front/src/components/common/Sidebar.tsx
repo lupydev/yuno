@@ -1,7 +1,8 @@
 import React from 'react';
-import { LayoutDashboard, Activity, Users, Bell, Menu } from 'lucide-react';
+import { LayoutDashboard, Activity, Users, Bell, Menu, Sun, Moon } from 'lucide-react';
 import { useNavigate, useLocation } from 'react-router-dom';
 import logo from '../../assets/yunologo.png';
+import { useTheme } from '../../contexts/ThemeContext';
 
 interface SidebarProps {
     sidebarOpen: boolean;
@@ -23,17 +24,31 @@ const Sidebar: React.FC<SidebarProps> = ({ sidebarOpen, setSidebarOpen }) => {
             {/* Logo + Toggle */}
             <div className="px-4 py-5 border-b border-slate-800 flex items-center justify-between">
                 <div className="flex items-center gap-3">
-                    <img src={logo} alt="YUNO" className={`${sidebarOpen ? 'w-36' : 'w-6'} object-contain transition-all`} />
+                    <div className="overflow-hidden rounded-md" style={{ width: sidebarOpen ? 144 : 36 }}>
+                        <img
+                            src={logo}
+                            alt="YUNO"
+                            style={{
+                                width: sidebarOpen ? 240 : 240,
+                                height: 'auto',
+                                objectFit: 'none',
+                                objectPosition: sidebarOpen ? 'left center' : 'center center',
+                                transition: 'all 200ms ease'
+                            }}
+                        />
+                    </div>
                 </div>
 
-                <button
-                    onClick={() => setSidebarOpen(!sidebarOpen)}
-                    className="p-2 rounded-md hover:bg-slate-800/60 transition"
-                    aria-label="Toggle sidebar"
-                    title="Toggle sidebar"
-                >
-                    <Menu className="w-5 h-5 text-slate-300" />
-                </button>
+                <div className="flex items-center gap-2">
+                    <button
+                        onClick={() => setSidebarOpen(!sidebarOpen)}
+                        className="p-2 rounded-md hover:bg-slate-800/60 transition"
+                        aria-label="Toggle sidebar"
+                        title="Toggle sidebar"
+                    >
+                        <Menu className="w-5 h-5 text-slate-300" />
+                    </button>
+                </div>
             </div>
 
             {/* Navigation */}

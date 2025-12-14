@@ -210,7 +210,7 @@ const DashboardAdmin: React.FC = () => {
     const StatusIcon = statusConfig[globalStatus].icon;
 
     return (
-        <div className="flex h-screen bg-slate-900 text-slate-100 antialiased">
+        <div className="flex-1 bg-slate-900 text-slate-100 antialiased min-h-full">
 
             {/* Main Content */}
             <div className="flex-1 overflow-auto">

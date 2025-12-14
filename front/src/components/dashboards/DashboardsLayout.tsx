@@ -1,8 +1,10 @@
 // DashboardLayout.tsx
 import React, { useState } from 'react';
 import { LayoutDashboard, Activity, Bell, Menu, Users, LogOut } from 'lucide-react';
+import ThemeToggle from '../common/ThemeToggle';
 import { useNavigate, Outlet } from 'react-router-dom';
 import { useAuth } from '../../contexts/useAuth';
+
 
 export const DashboardLayout: React.FC = () => {
     const [sidebarOpen, setSidebarOpen] = useState(true);
@@ -29,10 +31,12 @@ export const DashboardLayout: React.FC = () => {
         <div className="flex h-screen bg-slate-900 text-white">
             {/* Sidebar */}
             <div className={`bg-slate-950 p-4 flex flex-col transition-all ${sidebarOpen ? 'w-64' : 'w-20'}`}>
-                <div className="mb-6">
-                    <button onClick={() => setSidebarOpen(!sidebarOpen)} className="p-2 hover:bg-slate-800 rounded-lg">
-                        <Menu className="w-6 h-6" />
-                    </button>
+                <div className="mb-6 flex items-center justify-between">
+                    <div className="flex items-center gap-2">
+                        <button onClick={() => setSidebarOpen(!sidebarOpen)} className="p-2 hover:bg-slate-800 rounded-lg">
+                            <Menu className="w-6 h-6" />
+                        </button>
+                    </div>
                     {sidebarOpen && (
                         <div className="mt-4">
                             <h1 className="text-2xl font-bold">YUNO</h1>
@@ -68,7 +72,10 @@ export const DashboardLayout: React.FC = () => {
             </div>
 
             {/* Main Content */}
-            <div className="flex-1 overflow-auto">
+            <div className="flex-1 overflow-auto relative pr-12 pt-6">
+                <div className="absolute top-4 right-6 z-30">
+                    <ThemeToggle />
+                </div>
                 <Outlet />
             </div>
         </div>

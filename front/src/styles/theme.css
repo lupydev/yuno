@@ -1,0 +1,42 @@
+/* Light mode overrides when [data-theme="light"] is set on documentElement */
+
+[data-theme="light"] body {
+  background-color: #f8fafc !important; /* slate-50 */
+  color: #0f172a !important; /* slate-900 */
+}
+
+/* Background surfaces */
+[data-theme="light"] .bg-slate-900 { background-color: #ffffff !important; }
+[data-theme="light"] .bg-slate-950 { background-color: #f8fafc !important; }
+[data-theme="light"] .bg-slate-800 { background-color: #f1f5f9 !important; }
+
+/* Text colors */
+[data-theme="light"] .text-white { color: #0f172a !important; }
+[data-theme="light"] .text-slate-100 { color: #0f172a !important; }
+[data-theme="light"] .text-slate-200 { color: #334155 !important; }
+[data-theme="light"] .text-slate-300 { color: #475569 !important; }
+
+/* Borders */
+[data-theme="light"] .border-slate-800 { border-color: #e2e8f0 !important; }
+
+/* Buttons and accents */
+[data-theme="light"] .bg-indigo-600 { background-color: #4f46e5 !important; }
+[data-theme="light"] .text-slate-400 { color: #475569 !important; }
+
+/* Cards */
+[data-theme="light"] .shadow-sm { box-shadow: 0 1px 2px rgba(2,6,23,0.04) !important; }
+
+/* Reduce contrast on hover in light mode */
+[data-theme="light"] .hover\:bg-slate-800:hover { background-color: #eef2ff !important; }
+
+/* Ensure links/buttons visible */
+[data-theme="light"] .hover\:bg-slate-800\/40:hover { background-color: rgba(236, 244, 255, 0.6) !important; }
+
+/* Minimal fixes: adjust badge backgrounds */
+[data-theme="light"] .bg-emerald-900\/20 { background-color: rgba(16, 185, 129, 0.08) !important; }
+
+/* Profile avatar border */
+[data-theme="light"] .rounded-full { border: none !important; }
+
+/* Make sure svg strokes are visible */
+[data-theme="light"] svg { color: inherit; }
