@@ -1,21 +1,11 @@
-"""
-Logging Configuration - InvMe Event Platform
-
-Sistema de logging centralizado con soporte para:
-- Diferentes niveles según entorno (development/production)
-- Formato estructurado JSON en producción
-- Logs en consola coloreados en desarrollo
-- Rotación de archivos
-- Integración con FastAPI y servicios
-"""
-
 import logging
 import sys
 from pathlib import Path
 from typing import Any
 
-from app.infraestructure.core.config import settings
 from pythonjsonlogger.json import JsonFormatter
+
+from app.infraestructure.core.config import settings
 
 
 class ColoredFormatter(logging.Formatter):
