@@ -104,6 +104,38 @@
   border-color: #e6e6e6 !important;
 }
 
+/* Tooltip box override: ensure dark background and white text in light mode */
+[data-theme="light"] .chart-root .chart-tooltip-box {
+  background-color: rgba(15,23,42,0.95) !important;
+  color: #ffffff !important;
+  border-color: rgba(255,255,255,0.06) !important;
+}
+[data-theme="light"] .chart-root .chart-tooltip-box * { color: #ffffff !important; fill: #ffffff !important; }
+
+/* Breadcrumb Reports button in cards: white bg in light mode but keep text color as-is */
+[data-theme="light"] .report-breadcrumb { background-color: #ffffff !important; border-color: #e6e6e6 !important; }
+
+/* Ensure lightweight slate backgrounds with opacity become solid white in light mode (small panels) */
+[data-theme="light"] .bg-slate-900\/40,
+[data-theme="light"] .bg-slate-900\/30,
+[data-theme="light"] .bg-slate-900\/50,
+[data-theme="light"] .bg-slate-800\/40,
+[data-theme="light"] .bg-slate-800\/30 {
+  background-color: #ffffff !important;
+  background-image: none !important;
+}
+
+/* Chart headings: dark in light mode, white in dark */
+.chart-heading { color: #ffffff; }
+[data-theme="light"] .chart-heading { color: #0f172a !important; }
+
+/* Card surface tweak: make slightly lighter in dark mode for contrast */
+.card-surface { background-color: rgba(2,6,23,0.6); }
+@media (prefers-color-scheme: dark) {
+  .card-surface { background-color: rgba(255,255,255,0.03); }
+}
+
+
 /* Strong override: ensure purple buttons and any children always use white text in light mode */
 [data-theme="light"] button.bg-indigo-600,
 [data-theme="light"] button.bg-indigo-700,

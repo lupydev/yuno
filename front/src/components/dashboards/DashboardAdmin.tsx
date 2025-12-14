@@ -315,7 +315,7 @@ const DashboardAdmin: React.FC = () => {
                                                     style={{ left: `${xPerc}%`, top: `${topTotal}%`, transform: 'translate(-50%, -100%)' }}
                                                     className="absolute pointer-events-none z-20 chart-tooltip"
                                                 >
-                                                    <div className="bg-slate-800 border border-slate-700 rounded-lg p-3 shadow-xl text-left text-sm text-slate-200">
+                                                    <div className="chart-tooltip-box bg-slate-800 border border-slate-700 rounded-lg p-3 shadow-xl text-left text-sm text-slate-200">
                                                         <div className="text-xs text-slate-400 mb-1">{d.time}</div>
                                                         <div className="text-sm font-bold text-white mb-1">Total: {d.total.toLocaleString()}</div>
                                                         <div className="text-xs text-emerald-400">Approved: {d.approved.toLocaleString()}</div>

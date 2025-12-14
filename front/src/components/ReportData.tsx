@@ -183,7 +183,7 @@ const TransactionReport: React.FC = () => {
                 {/* Header */}
                 <div className="flex items-center justify-between mb-4">
                     <div className="flex items-center gap-3 text-sm text-slate-400">
-                        <button onClick={() => navigate('/reports')} className="px-2 py-1 bg-slate-800/40 rounded-md text-slate-200 hover:bg-slate-800/60 transition">Reports</button>
+                        <button onClick={() => navigate('/reports')} className="px-2 py-1 report-breadcrumb bg-slate-800/40 rounded-md text-slate-200 hover:bg-slate-800/60 transition">Reports</button>
                         <span className="text-slate-500">/</span>
                         <button onClick={() => navigate(`/reports?merchant=${encodeURIComponent(reportData.cause.details?.clientName || '')}`)} className="text-slate-300 font-medium hover:underline">{reportData.cause.details?.clientName || 'Merchant'}</button>
                         <span className="text-slate-500">/</span>
@@ -191,9 +191,9 @@ const TransactionReport: React.FC = () => {
                     </div>
                     <button 
                         onClick={() => navigate('/reports')}
-                        className="group flex items-center gap-2 text-sm font-medium px-5 py-2.5 text-slate-200 hover:text-white bg-slate-800/60 hover:bg-slate-700/80 rounded-lg transition-all duration-200 border border-slate-600/60 hover:border-slate-500 shadow-lg shadow-black/20 hover:shadow-black/40"
+                        className="group flex items-center gap-2 text-sm font-medium px-5 py-2.5 bg-indigo-600 text-white hover:bg-indigo-700 rounded-lg transition-all duration-200 border border-transparent shadow-lg"
                     >
-                        <ArrowLeft size={16} className="transition-transform group-hover:-translate-x-1" />
+                        <ArrowLeft size={16} className="text-white transition-transform group-hover:-translate-x-1" />
                         <span>Back to list</span>
                     </button>
                 </div>
@@ -260,7 +260,7 @@ const TransactionReport: React.FC = () => {
 
                 {/* Cause Analysis */}
                 <div className="card-surface bg-gradient-to-b from-slate-900/60 to-slate-900/40 rounded-xl shadow-sm p-6 border border-slate-800/20">
-                    <h2 className="text-xl font-bold text-gray-100 mb-4">Root Cause Analysis</h2>
+                    <h2 className="text-xl font-bold chart-heading mb-4">Root Cause Analysis</h2>
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                         <div className="border border-slate-800/30 rounded-lg p-4 bg-slate-900/40">
                             <span className="text-sm font-medium text-slate-400">Responsible Party</span>
@@ -298,12 +298,12 @@ const TransactionReport: React.FC = () => {
                 {/* Solutions */}
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                     <div className="bg-gradient-to-br from-slate-900/50 to-slate-900/30 rounded-xl p-6 border border-slate-800/20 shadow-sm">
-                        <h2 className="text-xl font-bold text-white mb-4">AI Recommended Solution</h2>
+                        <h2 className="text-xl font-bold chart-heading mb-4">AI Recommended Solution</h2>
                         <p className="text-slate-300 leading-relaxed">{reportData.aiSolution}</p>
                     </div>
                     <div className="bg-gradient-to-br from-slate-900/50 to-slate-900/30 rounded-xl p-6 border border-slate-800/20 shadow-sm">
                         <div className="flex items-center justify-between mb-4">
-                            <h2 className="text-xl font-bold text-white">Human Solution</h2>
+                            <h2 className="text-xl font-bold chart-heading">Human Solution</h2>
                             <div className="text-sm text-slate-300">Executed by: <span className="font-medium text-white">{reportData.humanBy || '—'}</span></div>
                         </div>
                         <p className="text-slate-300 leading-relaxed">{reportData.humanSolution}</p>
@@ -323,7 +323,7 @@ const TransactionReport: React.FC = () => {
                     <div className="bg-gradient-to-b from-slate-900/60 to-slate-900/40 rounded-xl p-6 border border-slate-800/20 shadow-sm">
                         {activeChart === 'failed' && (
                             <>
-                                <h2 className="text-xl font-bold text-gray-100 mb-6">Failed Transactions by Hour</h2>
+                                <h2 className="text-xl font-bold chart-heading mb-6">Failed Transactions by Hour</h2>
                                 <ResponsiveContainer width="100%" height={300}>
                                     <BarChart data={reportData.failedTransactions}>
                                         <CartesianGrid strokeDasharray="3 3" stroke="#374151" />
