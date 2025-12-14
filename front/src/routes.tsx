@@ -2,7 +2,7 @@ import { Routes, Route } from 'react-router-dom';
 import { DashboardLayout } from './components/dashboards/DashboardsLayout';
 import DashboardAdmin from './components/dashboards/DashboardAdmin';
 import UsersView from './components/UsersView';
-import { ReportsPage } from './pages/ReportsPage';
+import TransactionReport from "@/components/ReportData";
 import { Login } from './pages/LoginPage';
 
 export const AppRoutes = () => {
@@ -23,7 +23,7 @@ export const AppRoutes = () => {
                 path="/reports"
                 element={
                     <DashboardLayout>
-                        <ReportsPage />
+                        <TransactionReport />
                     </DashboardLayout>
                 }
             />
