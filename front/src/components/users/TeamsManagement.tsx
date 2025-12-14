@@ -33,7 +33,7 @@ export const TeamsManagement: React.FC = () => {
             const response = await apiBackClient.get('/teams/');
             setTeams(response.data);
         } catch (err) {
-            console.error('Error al cargar equipos:', err);
+            console.error('Error loading teams:', err);
         } finally {
             setIsLoading(false);
         }
@@ -47,7 +47,7 @@ export const TeamsManagement: React.FC = () => {
             window.dispatchEvent(new Event('teamsUpdated'));
         } catch (err: any) {
             console.error('Error al actualizar equipo:', err);
-            alert(err.response?.data?.detail || 'Error al actualizar el equipo');
+            alert(err.response?.data?.detail || 'Error updating the team');
             throw err;
         }
     };
@@ -61,7 +61,7 @@ export const TeamsManagement: React.FC = () => {
             window.dispatchEvent(new Event('teamsUpdated'));
         } catch (err: any) {
             console.error('Error al eliminar equipo:', err);
-            alert(err.response?.data?.detail || 'Error al eliminar el equipo. Asegúrate de que no tenga developers asignados.');
+            alert(err.response?.data?.detail || 'Error deleting the team. Make sure it has no developers assigned.');
         }
     };
 
@@ -78,10 +78,10 @@ export const TeamsManagement: React.FC = () => {
             <div className="p-4 border-b border-slate-800">
                 <h3 className="text-base font-semibold text-white flex items-center gap-2">
                     <Users className="w-4 h-4" />
-                    Equipos Existentes
+                    Existing Teams
                 </h3>
                 <p className="text-slate-400 text-xs mt-1">
-                    {teams.length} equipo{teams.length !== 1 ? 's' : ''} registrado{teams.length !== 1 ? 's' : ''}
+                    {teams.length} team{teams.length !== 1 ? 's' : ''} registered
                 </p>
             </div>
 
@@ -138,7 +138,7 @@ export const TeamsManagement: React.FC = () => {
             {teams.length === 0 && (
                 <div className="text-center py-8">
                     <Users className="w-10 h-10 text-slate-600 mx-auto mb-2" />
-                    <p className="text-slate-400 text-sm">No hay equipos registrados</p>
+                    <p className="text-slate-400 text-sm">No teams registered</p>
                 </div>
             )}
 
@@ -152,7 +152,7 @@ export const TeamsManagement: React.FC = () => {
 
             {deletingTeam && (
                 <DeleteConfirmModal
-                    userName={`el equipo "${deletingTeam}"`}
+                    userName={`the team "${deletingTeam}"`}
                     onConfirm={handleDeleteTeam}
                     onCancel={() => setDeletingTeam(null)}
                 />

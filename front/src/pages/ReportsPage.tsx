@@ -1,7 +1,7 @@
+import React from 'react';
+import TransactionReport from "@/components/ReportData";
+
 
 export const ReportsPage = () => {
-    return (
-        <div className="flex md:flex-row h-screen w-full items-center justify-center">
-        </div>
-    );
+    return <TransactionReport />;
 };

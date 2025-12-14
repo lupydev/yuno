@@ -33,22 +33,22 @@ export const CreateUserModal: React.FC<CreateUserModalProps> = ({
     const handleSubmit = async () => {
         // Validaciones
         if (!formData.email || !formData.name || !formData.password) {
-            alert('Por favor completa todos los campos requeridos');
+            alert('Please complete all required fields');
             return;
         }
 
         if (formData.password !== formData.confirmPassword) {
-            alert('Las contraseñas no coinciden');
+            alert('Passwords do not match');
             return;
         }
 
         if (formData.password.length < 8) {
-            alert('La contraseña debe tener al menos 8 caracteres');
+            alert('Password must be at least 8 characters');
             return;
         }
 
         if (!formData.email.includes('@')) {
-            alert('Por favor ingresa un email válido');
+            alert('Please enter a valid email');
             return;
         }
 
@@ -80,7 +80,7 @@ export const CreateUserModal: React.FC<CreateUserModalProps> = ({
                         <div className="p-2 bg-blue-500/10 rounded-lg">
                             <UserPlus className="w-6 h-6 text-blue-400" />
                         </div>
-                        <h2 className="text-xl font-bold text-white">Crear Usuario</h2>
+                        <h2 className="text-xl font-bold text-white">Create User</h2>
                     </div>
                     <button
                         onClick={onClose}
@@ -93,14 +93,14 @@ export const CreateUserModal: React.FC<CreateUserModalProps> = ({
                 <div className="p-6 space-y-4">
                     <div>
                         <label className="block text-sm font-medium text-slate-300 mb-2">
-                            Nombre Completo <span className="text-red-400">*</span>
+                            Full Name <span className="text-red-400">*</span>
                         </label>
                         <input
                             type="text"
                             value={formData.name}
                             onChange={(e) => setFormData({ ...formData, name: e.target.value })}
-                            placeholder="Ej: Juan Pérez"
-                            className="w-full px-4 py-2 bg-slate-800 border border-slate-700 rounded-lg text-slate-200 placeholder-slate-500 focus:outline-none focus:border-blue-600"
+                            placeholder="e.g. John Doe"
+                            className="w-full px-4 py-2 bg-slate-800 border border-slate-700 rounded-lg text-slate-200 placeholder-slate-500 focus:outline-none focus:border-indigo-600"
                         />
                     </div>
 
@@ -112,34 +112,34 @@ export const CreateUserModal: React.FC<CreateUserModalProps> = ({
                             type="email"
                             value={formData.email}
                             onChange={(e) => setFormData({ ...formData, email: e.target.value })}
-                            placeholder="email@ejemplo.com"
-                            className="w-full px-4 py-2 bg-slate-800 border border-slate-700 rounded-lg text-slate-200 placeholder-slate-500 focus:outline-none focus:border-blue-600"
+                            placeholder="email@example.com"
+                            className="w-full px-4 py-2 bg-slate-800 border border-slate-700 rounded-lg text-slate-200 placeholder-slate-500 focus:outline-none focus:border-indigo-600"
                         />
                     </div>
 
                     <div>
                         <label className="block text-sm font-medium text-slate-300 mb-2">
-                            Contraseña <span className="text-red-400">*</span>
+                            Password <span className="text-red-400">*</span>
                         </label>
                         <input
                             type="password"
                             value={formData.password}
                             onChange={(e) => setFormData({ ...formData, password: e.target.value })}
-                            placeholder="Mínimo 8 caracteres"
-                            className="w-full px-4 py-2 bg-slate-800 border border-slate-700 rounded-lg text-slate-200 placeholder-slate-500 focus:outline-none focus:border-blue-600"
+                            placeholder="Minimum 8 characters"
+                            className="w-full px-4 py-2 bg-slate-800 border border-slate-700 rounded-lg text-slate-200 placeholder-slate-500 focus:outline-none focus:border-indigo-600"
                         />
                     </div>
 
                     <div>
                         <label className="block text-sm font-medium text-slate-300 mb-2">
-                            Confirmar Contraseña <span className="text-red-400">*</span>
+                            Confirm Password <span className="text-red-400">*</span>
                         </label>
                         <input
                             type="password"
                             value={formData.confirmPassword}
                             onChange={(e) => setFormData({ ...formData, confirmPassword: e.target.value })}
-                            placeholder="Repite la contraseña"
-                            className="w-full px-4 py-2 bg-slate-800 border border-slate-700 rounded-lg text-slate-200 placeholder-slate-500 focus:outline-none focus:border-blue-600"
+                            placeholder="Repeat the password"
+                            className="w-full px-4 py-2 bg-slate-800 border border-slate-700 rounded-lg text-slate-200 placeholder-slate-500 focus:outline-none focus:border-indigo-600"
                         />
                     </div>
 
@@ -147,39 +147,39 @@ export const CreateUserModal: React.FC<CreateUserModalProps> = ({
                     {!fixedRole && (
                         <div>
                             <label className="block text-sm font-medium text-slate-300 mb-2">
-                                Rol <span className="text-red-400">*</span>
+                                Role <span className="text-red-400">*</span>
                             </label>
                             <select
                                 value={formData.role}
                                 onChange={(e) => setFormData({ ...formData, role: e.target.value })}
-                                className="w-full px-4 py-2 bg-slate-800 border border-slate-700 rounded-lg text-slate-200 focus:outline-none focus:border-blue-600"
+                                className="w-full px-4 py-2 bg-slate-800 border border-slate-700 rounded-lg text-slate-200 focus:outline-none focus:border-indigo-600"
                             >
-                                <option value="CLIENT">Cliente</option>
+                                <option value="CLIENT">Client</option>
                                 <option value="DEVELOPER">Developer</option>
                                 <option value="TEAM_LEADER">Team Leader</option>
                             </select>
                             <p className="text-slate-500 text-xs mt-1">
-                                Selecciona el rol del usuario en el sistema
+                                Select the user's role in the system
                             </p>
                         </div>
                     )}
 
                     <div>
                         <label className="block text-sm font-medium text-slate-300 mb-2">
-                            Equipo (Opcional)
+                            Team (optional)
                         </label>
                         <select
                             value={formData.team_id}
                             onChange={(e) => setFormData({ ...formData, team_id: e.target.value })}
-                            className="w-full px-4 py-2 bg-slate-800 border border-slate-700 rounded-lg text-slate-200 focus:outline-none focus:border-blue-600"
+                            className="w-full px-4 py-2 bg-slate-800 border border-slate-700 rounded-lg text-slate-200 focus:outline-none focus:border-indigo-600"
                         >
-                            <option value="">Sin equipo asignado</option>
+                            <option value="">No team assigned</option>
                             {teams.map(team => (
                                 <option key={team} value={team}>{team}</option>
                             ))}
                         </select>
                         <p className="text-slate-500 text-xs mt-1">
-                            Puedes asignar un equipo más tarde
+                            You can assign a team later
                         </p>
                     </div>
 
@@ -189,14 +189,14 @@ export const CreateUserModal: React.FC<CreateUserModalProps> = ({
                             disabled={isSubmitting}
                             className="flex-1 px-4 py-2 bg-slate-800 hover:bg-slate-700 text-slate-300 rounded-lg font-medium transition-colors disabled:opacity-50"
                         >
-                            Cancelar
+                            Cancel
                         </button>
                         <button
                             onClick={handleSubmit}
                             disabled={isSubmitting}
-                            className="flex-1 px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-lg font-medium transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+                            className="flex-1 px-4 py-2 bg-indigo-600 hover:bg-indigo-700 text-white rounded-lg font-medium transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
                         >
-                            {isSubmitting ? 'Creando...' : 'Crear Usuario'}
+                            {isSubmitting ? 'Creating...' : 'Create User' }
                         </button>
                     </div>
                 </div>

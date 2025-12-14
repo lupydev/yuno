@@ -20,7 +20,7 @@ export const DeleteConfirmModal: React.FC<DeleteConfirmModalProps> = ({
                         <div className="p-2 bg-red-500/10 rounded-lg">
                             <AlertTriangle className="w-6 h-6 text-red-400" />
                         </div>
-                        <h2 className="text-xl font-bold text-white">Confirmar Eliminación</h2>
+                        <h2 className="text-xl font-bold text-white">Confirm Deletion</h2>
                     </div>
                     <button
                         onClick={onCancel}
@@ -32,11 +32,11 @@ export const DeleteConfirmModal: React.FC<DeleteConfirmModalProps> = ({
 
                 <div className="p-6">
                     <p className="text-slate-300 mb-4">
-                        ¿Estás seguro de que deseas eliminar al usuario{' '}
+                        Are you sure you want to delete the user{' '}
                         <span className="font-semibold text-white">{userName}</span>?
                     </p>
                     <p className="text-slate-400 text-sm">
-                        Esta acción no se puede deshacer. El usuario será eliminado permanentemente del sistema.
+                        This action cannot be undone. The user will be permanently removed from the system.
                     </p>
 
                     <div className="flex gap-3 mt-6">
@@ -44,13 +44,13 @@ export const DeleteConfirmModal: React.FC<DeleteConfirmModalProps> = ({
                             onClick={onCancel}
                             className="flex-1 px-4 py-2 bg-slate-800 hover:bg-slate-700 text-slate-300 rounded-lg font-medium transition-colors"
                         >
-                            Cancelar
+                            Cancel
                         </button>
                         <button
                             onClick={onConfirm}
                             className="flex-1 px-4 py-2 bg-red-600 hover:bg-red-700 text-white rounded-lg font-medium transition-colors"
                         >
-                            Eliminar Usuario
+                            Delete User
                         </button>
                     </div>
                 </div>
