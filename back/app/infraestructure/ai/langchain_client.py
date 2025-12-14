@@ -32,7 +32,7 @@ class LangChainClient:
     Cliente para interactuar con LangChain con fallback automático
 
     Proporciona:
-    - Primary: GitHub Models (GPT-4o-mini)
+    - Primary: OpenAI (GPT-4o-mini)
     - Fallback: Google Gemini (gemini-2.0-flash-lite)
 
     El fallback se activa automáticamente cuando el primary falla.
@@ -42,7 +42,7 @@ class LangChainClient:
         client = LangChainClient()
         llm = client.get_structured_llm(NormalizedPaymentSchema)
         result = llm.invoke("Normalize this payment: {...}")
-        # Usa GitHub Models, si falla automáticamente usa Gemini
+        # Usa OpenAI, si falla automáticamente usa Gemini
         ```
     """
 
@@ -50,10 +50,9 @@ class LangChainClient:
         """
         Inicializa el cliente con configuración desde settings
 
-        Configuración Primary (GitHub Models):
+        Configuración Primary (OpenAI):
         - model: OPENAI_MODEL (default: gpt-4o-mini)
-        - base_url: OPENAI_BASE_URL
-        - api_key: GITHUB_TOKEN
+        - api_key: OPENAI_API_KEY
 
         Configuración Fallback (Gemini):
         - model: GEMINI_MODEL (default: gemini-2.0-flash-lite)
@@ -64,16 +63,15 @@ class LangChainClient:
 
     def _get_primary_llm(self) -> BaseChatModel:
         """
-        Lazy initialization del LLM primary (GitHub Models)
+        Lazy initialization del LLM primary (OpenAI)
 
         Returns:
-            ChatOpenAI configurado con GitHub Models
+            ChatOpenAI configurado con OpenAI API
         """
         if self._primary_llm is None:
             logger.info(
-                "Initializing PRIMARY LLM (GitHub Models)",
+                "Initializing PRIMARY LLM (OpenAI)",
                 extra={
-                    "base_url": settings.OPENAI_BASE_URL,
                     "model": settings.OPENAI_MODEL,
                     "temperature": 0.0,
                     "timeout": settings.AI_TIMEOUT_SECONDS,
@@ -81,8 +79,7 @@ class LangChainClient:
             )
 
             self._primary_llm = ChatOpenAI(
-                base_url=settings.OPENAI_BASE_URL,
-                api_key=settings.GITHUB_TOKEN,
+                api_key=settings.OPENAI_API_KEY,
                 model_name=settings.OPENAI_MODEL,
                 temperature=0.0,
                 timeout=settings.AI_TIMEOUT_SECONDS,
